@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillHub — Profile</title>
+  <link rel="icon" href="../../assets/icons/icon-192.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/variables.css">
+  <link rel="stylesheet" href="../../css/reset.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/utilities.css">
+  <link rel="stylesheet" href="../../css/layout.css">
+  <link rel="stylesheet" href="../../css/pages.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar"></aside>
+    <div class="sidebar-overlay"></div>
+    <div class="main-content">
+      <header class="topbar"></header>
+      <main class="page-content">
+        <div class="card mb-6">
+          <div class="flex gap-6 items-center flex-wrap">
+            <div class="avatar avatar-xl" id="avatarEl"></div>
+            <div style="flex:1">
+              <h2 id="userName">User</h2>
+              <p class="text-secondary" id="userHandle">@user</p>
+              <div class="flex gap-4 mt-2 text-sm text-secondary">
+                <span><span class="material-icons" style="font-size:16px;vertical-align:middle">work</span> <span id="userRole">Developer</span></span>
+                <span><span class="material-icons" style="font-size:16px;vertical-align:middle">location_on</span> <span id="userLocation">Tashkent</span></span>
+              </div>
+            </div>
+            <div class="flex gap-3">
+              <button class="btn btn-primary" id="followBtn" data-i18n="community.follow">Follow</button>
+              <button class="btn btn-outline" onclick="App.utils.copyToClipboard(window.location.href);App.toast(App.t('community.link_copied'),'success')" data-i18n="community.share">Share</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid gap-6" style="grid-template-columns:1fr 2fr">
+          <div>
+            <div class="card mb-4">
+              <h4 class="mb-4" data-i18n="profile.about">About</h4>
+              <p class="text-sm text-secondary" id="userBio"></p>
+            </div>
+            <div class="card mb-4">
+              <h4 class="mb-4" data-i18n="profile.skills">Skills</h4>
+              <div class="flex gap-2 flex-wrap" id="skillsList"></div>
+            </div>
+            <div class="card">
+              <h4 class="mb-4" data-i18n="profile.links">Links</h4>
+              <div id="linksList" class="flex flex-col gap-2"></div>
+            </div>
+          </div>
+          <div>
+            <h4 class="mb-4" data-i18n="profile.projects">Projects</h4>
+            <div class="grid grid-2 gap-4" id="userProjects"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../../js/utils.js"></script>
+  <script src="../../js/i18n.js"></script>
+  <script src="../../js/supabase.js"></script>
+  <script src="../../js/auth.js"></script>
+  <script src="../../js/ui.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script src="../../js/pages.js"></script>
+  <script>
+    (async function() {
+      var langs = ['uz','en','ru'];
+      for (var i = 0; i < langs.length; i++) {
+        var res = await fetch('../../i18n/' + langs[i] + '.json');
+        App.i18n.load(langs[i], await res.json());
+      }
+      if (!App.auth.requireAuth()) return;
+      App.pages.initLayout({ activePage: 'profile', title: App.t('nav.profile') });
+
+      var user = App.auth.getCurrentUser();
+      document.getElementById('userName').textContent = user.fullName;
+      document.getElementById('userHandle').textContent = '@' + App.utils.slugify(user.fullName);
+      document.getElementById('userBio').textContent = user.bio || 'No bio yet.';
+      document.getElementById('userRole').textContent = user.role === 'admin' ? 'Admin' : 'Developer';
+
+      var avatarEl = document.getElementById('avatarEl');
+      if (user.avatar) {
+        avatarEl.innerHTML = '<img src="' + user.avatar + '" alt="">';
+      } else {
+        avatarEl.textContent = App.utils.getInitials(user.fullName);
+      }
+
+      var skillsEl = document.getElementById('skillsList');
+      (user.skills || []).forEach(function(s) {
+        skillsEl.innerHTML += '<span class="badge badge-primary">' + App.utils.sanitize(s) + '</span>';
+      });
+
+      var linksEl = document.getElementById('linksList');
+      if (user.links && Object.keys(user.links).length > 0) {
+        Object.keys(user.links).forEach(function(k) {
+          if (user.links[k]) {
+            linksEl.innerHTML += '<a href="https://' + user.links[k] + '" target="_blank" class="flex items-center gap-2 text-sm" style="padding:var(--space-2) 0"><span class="material-icons" style="font-size:16px">link</span>' + k + '</a>';
+          }
+        });
+      } else {
+        linksEl.innerHTML = '<p class="text-sm text-tertiary" data-i18n="profile.no_links">No links added yet</p>';
+      }
+
+      var projects = App.db.getProjects().filter(function(p) { return p.userId === user.id; });
+      var projectsEl = document.getElementById('userProjects');
+      projects.forEach(function(p) {
+        projectsEl.innerHTML += '<div class="card"><h4 class="mb-2">' + App.utils.sanitize(p.title) + '</h4><p class="text-sm text-secondary mb-4">' + App.utils.sanitize(p.description || '') + '</p><div class="flex gap-2 flex-wrap">' +
+          (p.tags||[]).map(function(t){ return '<span class="badge badge-primary">'+App.utils.sanitize(t)+'</span>'; }).join('') +
+          '</div></div>';
+      });
+      if (projects.length === 0) {
+        projectsEl.innerHTML = '<p class="text-secondary text-sm">No projects yet.</p>';
+      }
+
+      var isFollowing = false;
+      document.getElementById('followBtn').addEventListener('click', function() {
+        isFollowing = !isFollowing;
+        this.textContent = isFollowing ? App.t('community.unfollow') : App.t('community.follow');
+        this.className = isFollowing ? 'btn btn-secondary' : 'btn btn-primary';
+      });
+    })();
+  </script>
+</body>
+</html>

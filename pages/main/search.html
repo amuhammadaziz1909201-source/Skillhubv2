@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillHub — Search</title>
+  <link rel="icon" href="../../assets/icons/icon-192.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/variables.css">
+  <link rel="stylesheet" href="../../css/reset.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/utilities.css">
+  <link rel="stylesheet" href="../../css/layout.css">
+  <link rel="stylesheet" href="../../css/pages.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar"></aside>
+    <div class="sidebar-overlay"></div>
+    <div class="main-content">
+      <header class="topbar"></header>
+      <main class="page-content">
+        <div class="page-header">
+          <h2 data-i18n="search.title">Search</h2>
+        </div>
+
+        <div class="input-with-icon mb-8" style="max-width:600px">
+          <span class="material-icons icon">search</span>
+          <input class="input" type="search" id="searchInput" style="padding-left:2.5rem;font-size:var(--text-lg);padding:0.875rem 1rem 0.875rem 2.75rem" data-i18n-placeholder="search.placeholder" autofocus>
+        </div>
+
+        <p class="text-sm text-secondary mb-6" id="resultCount"></p>
+
+        <div class="tabs mb-6">
+          <button class="tab active" data-filter="all">All</button>
+          <button class="tab" data-filter="projects">Projects</button>
+          <button class="tab" data-filter="users">Users</button>
+        </div>
+
+        <div id="results"></div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../../js/utils.js"></script>
+  <script src="../../js/i18n.js"></script>
+  <script src="../../js/supabase.js"></script>
+  <script src="../../js/auth.js"></script>
+  <script src="../../js/ui.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script src="../../js/pages.js"></script>
+  <script>
+    (async function() {
+      var langs = ['uz','en','ru'];
+      for (var i = 0; i < langs.length; i++) {
+        var res = await fetch('../../i18n/' + langs[i] + '.json');
+        App.i18n.load(langs[i], await res.json());
+      }
+      if (!App.auth.requireAuth()) return;
+      App.pages.initLayout({ activePage: 'search', title: App.t('nav.search') });
+
+      var currentFilter = 'all';
+
+      function doSearch() {
+        var q = document.getElementById('searchInput').value.toLowerCase().trim();
+        var results = document.getElementById('results');
+        var countEl = document.getElementById('resultCount');
+        results.innerHTML = '';
+
+        if (!q) {
+          countEl.textContent = '';
+          results.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><h3>' + App.t('search.try_different') + '</h3></div>';
+          return;
+        }
+
+        var items = [];
+
+        if (currentFilter === 'all' || currentFilter === 'projects') {
+          App.db.getProjects().forEach(function(p) {
+            if (p.title.toLowerCase().indexOf(q) !== -1 || (p.description||'').toLowerCase().indexOf(q) !== -1 || (p.tags||[]).join(' ').toLowerCase().indexOf(q) !== -1) {
+              items.push({ type: 'project', data: p });
+            }
+          });
+        }
+
+        if (currentFilter === 'all' || currentFilter === 'users') {
+          App.db.getUsers().forEach(function(u) {
+            if (u.fullName.toLowerCase().indexOf(q) !== -1 || u.email.toLowerCase().indexOf(q) !== -1 || (u.skills||[]).join(' ').toLowerCase().indexOf(q) !== -1) {
+              items.push({ type: 'user', data: u });
+            }
+          });
+        }
+
+        countEl.textContent = items.length + ' ' + App.t('search.results');
+
+        if (items.length === 0) {
+          results.innerHTML = '<div class="empty-state"><div class="icon">🔍</div><h3>' + App.t('search.no_results') + '</h3><p>' + App.t('search.try_different') + '</p></div>';
+          return;
+        }
+
+        items.forEach(function(item) {
+          if (item.type === 'project') {
+            var p = item.data;
+            var card = document.createElement('div');
+            card.className = 'card mb-4 flex gap-4 items-center';
+            card.innerHTML =
+              '<div style="width:80px;height:80px;border-radius:var(--radius-md);background:var(--bg-secondary);flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden">' +
+              (p.image ? '<img src="' + p.image + '" style="width:100%;height:100%;object-fit:cover">' : '<span class="material-icons text-tertiary">folder</span>') +
+              '</div>' +
+              '<div style="flex:1"><span class="badge badge-primary mb-2" style="display:inline-block">Project</span>' +
+              '<h4>' + App.utils.sanitize(p.title) + '</h4>' +
+              '<p class="text-sm text-secondary">' + App.utils.sanitize(p.description || '') + '</p>' +
+              '<div class="flex gap-2 mt-2 flex-wrap">' + (p.tags||[]).map(function(t){return '<span class="badge badge-primary">'+App.utils.sanitize(t)+'</span>';}).join('') + '</div></div>';
+            results.appendChild(card);
+          } else {
+            var u = item.data;
+            var card2 = document.createElement('div');
+            card2.className = 'card mb-4 flex gap-4 items-center';
+            card2.innerHTML =
+              '<div class="avatar avatar-lg">' + (u.avatar ? '<img src="' + u.avatar + '">' : App.utils.getInitials(u.fullName)) + '</div>' +
+              '<div style="flex:1"><span class="badge badge-success mb-2" style="display:inline-block">User</span>' +
+              '<h4>' + App.utils.sanitize(u.fullName) + '</h4>' +
+              '<p class="text-sm text-secondary">' + App.utils.sanitize(u.bio || 'Developer') + '</p>' +
+              '<div class="flex gap-2 mt-2 flex-wrap">' + (u.skills||[]).map(function(s){return '<span class="badge badge-primary">'+App.utils.sanitize(s)+'</span>';}).join('') + '</div></div>';
+            results.appendChild(card2);
+          }
+        });
+      }
+
+      document.getElementById('searchInput').addEventListener('input', App.utils.debounce(doSearch, 200));
+
+      document.querySelectorAll('[data-filter]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('[data-filter]').forEach(function(b) { b.classList.remove('active'); });
+          this.classList.add('active');
+          currentFilter = this.getAttribute('data-filter');
+          doSearch();
+        });
+      });
+
+      var params = App.utils.getParams();
+      if (params.q) {
+        document.getElementById('searchInput').value = params.q;
+        doSearch();
+      }
+
+      doSearch();
+    })();
+  </script>
+</body>
+</html>

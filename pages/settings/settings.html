@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillHub — Settings</title>
+  <link rel="icon" href="../../assets/icons/icon-192.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/variables.css">
+  <link rel="stylesheet" href="../../css/reset.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/utilities.css">
+  <link rel="stylesheet" href="../../css/layout.css">
+  <link rel="stylesheet" href="../../css/pages.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar"></aside>
+    <div class="sidebar-overlay"></div>
+    <div class="main-content">
+      <header class="topbar"></header>
+      <main class="page-content">
+        <div class="page-header">
+          <h2 data-i18n="settings.title">Settings</h2>
+        </div>
+
+        <div class="tabs mb-8">
+          <button class="tab active" data-stab="security" data-i18n="settings.security">Security</button>
+          <button class="tab" data-stab="preferences" data-i18n="settings.preferences">Preferences</button>
+        </div>
+
+        <div id="tab-security" class="card" style="max-width:640px">
+          <h3 class="mb-6" data-i18n="settings.security">Security</h3>
+          <div class="flex flex-col gap-6">
+            <div class="input-group">
+              <label data-i18n="settings.current_password">Current Password</label>
+              <input class="input" type="password" id="currentPass" placeholder="********">
+            </div>
+            <div class="input-group">
+              <label data-i18n="settings.new_password">New Password</label>
+              <input class="input" type="password" id="newPass" placeholder="********">
+            </div>
+            <div class="input-group">
+              <label data-i18n="settings.confirm_password">Confirm Password</label>
+              <input class="input" type="password" id="confirmPass" placeholder="********">
+            </div>
+            <div>
+              <button class="btn btn-primary" id="updatePassBtn" data-i18n="settings.update_password">Update Password</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-preferences" class="card" style="max-width:640px;display:none">
+          <h3 class="mb-6" data-i18n="settings.preferences">Preferences</h3>
+          <div class="flex flex-col gap-6">
+            <div class="input-group">
+              <label data-i18n="settings.language">Language</label>
+              <select class="input" id="langSelect" style="max-width:300px">
+                <option value="uz">O'zbek</option>
+                <option value="en">English</option>
+                <option value="ru">Русский</option>
+              </select>
+            </div>
+            <div class="input-group">
+              <label data-i18n="settings.theme">Theme</label>
+              <div class="flex gap-4 items-center">
+                <div class="toggle" id="themeToggle"></div>
+                <span id="themeLabel" class="text-sm"></span>
+              </div>
+            </div>
+            <div class="input-group">
+              <label data-i18n="settings.email_notifications">Email Notifications</label>
+              <div class="flex flex-col gap-3 mt-2">
+                <div class="flex items-center gap-3">
+                  <div class="toggle active" data-notif="project_updates"></div>
+                  <span class="text-sm" data-i18n="settings.project_updates">Project updates</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="toggle active" data-notif="security_alerts"></div>
+                  <span class="text-sm" data-i18n="settings.security_alerts">Security alerts</span>
+                </div>
+                <div class="flex items-center gap-3">
+                  <div class="toggle" data-notif="marketing"></div>
+                  <span class="text-sm" data-i18n="settings.marketing">Marketing</span>
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-primary" id="savePrefsBtn" style="align-self:flex-start" data-i18n="common.save">Save</button>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../../js/utils.js"></script>
+  <script src="../../js/i18n.js"></script>
+  <script src="../../js/supabase.js"></script>
+  <script src="../../js/auth.js"></script>
+  <script src="../../js/ui.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script src="../../js/pages.js"></script>
+  <script>
+    (async function() {
+      var langs = ['uz','en','ru'];
+      for (var i = 0; i < langs.length; i++) {
+        var res = await fetch('../../i18n/' + langs[i] + '.json');
+        App.i18n.load(langs[i], await res.json());
+      }
+      if (!App.auth.requireAuth()) return;
+      App.pages.initLayout({ activePage: 'settings', title: App.t('settings.title') });
+
+      var settings = App.db.getSettings();
+
+      document.querySelectorAll('[data-stab]').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          document.querySelectorAll('[data-stab]').forEach(function(t) { t.classList.remove('active'); });
+          this.classList.add('active');
+          var id = this.getAttribute('data-stab');
+          document.getElementById('tab-security').style.display = id === 'security' ? '' : 'none';
+          document.getElementById('tab-preferences').style.display = id === 'preferences' ? '' : 'none';
+        });
+      });
+
+      document.getElementById('langSelect').value = App.i18n.getLang();
+      document.getElementById('langSelect').addEventListener('change', function() {
+        App.i18n.setLang(this.value);
+        settings.language = this.value;
+        App.db.saveSettings(settings);
+      });
+
+      var themeToggle = document.getElementById('themeToggle');
+      var isDark = settings.theme === 'dark';
+      themeToggle.classList.toggle('active', isDark);
+      document.getElementById('themeLabel').textContent = isDark ? App.t('settings.dark') : App.t('settings.light');
+
+      themeToggle.addEventListener('click', function() {
+        this.classList.toggle('active');
+        var dark = this.classList.contains('active');
+        settings.theme = dark ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+        document.getElementById('themeLabel').textContent = dark ? App.t('settings.dark') : App.t('settings.light');
+        App.db.saveSettings(settings);
+      });
+
+      document.querySelectorAll('.toggle[data-notif]').forEach(function(t) {
+        t.addEventListener('click', function() { this.classList.toggle('active'); });
+      });
+
+      document.getElementById('updatePassBtn').addEventListener('click', function() {
+        var user = App.auth.getCurrentUser();
+        var current = document.getElementById('currentPass').value;
+        var newPass = document.getElementById('newPass').value;
+        var confirm = document.getElementById('confirmPass').value;
+
+        if (current !== user.password) { App.toast('Current password is wrong', 'error'); return; }
+        if (newPass.length < 8) { App.toast('Password too short', 'error'); return; }
+        if (newPass !== confirm) { App.toast('Passwords do not match', 'error'); return; }
+
+        App.auth.updateProfile({ password: newPass });
+        App.toast(App.t('settings.saved'), 'success');
+        document.getElementById('currentPass').value = '';
+        document.getElementById('newPass').value = '';
+        document.getElementById('confirmPass').value = '';
+      });
+
+      document.getElementById('savePrefsBtn').addEventListener('click', function() {
+        settings.language = document.getElementById('langSelect').value;
+        App.db.saveSettings(settings);
+        App.toast(App.t('settings.saved'), 'success');
+      });
+    })();
+  </script>
+</body>
+</html>

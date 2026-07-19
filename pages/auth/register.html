@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillHub — Register</title>
+  <link rel="icon" href="../../assets/icons/icon-192.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/variables.css">
+  <link rel="stylesheet" href="../../css/reset.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/utilities.css">
+  <link rel="stylesheet" href="../../css/pages.css">
+</head>
+<body>
+  <div class="auth-page">
+    <div class="auth-left">
+      <div class="auth-form-wrapper">
+        <div class="auth-logo">
+          <span style="font-size:1.5rem;font-weight:700;color:var(--primary)">SkillHub</span>
+          <span class="badge badge-primary">BETA</span>
+        </div>
+        <h2 class="auth-form-title" data-i18n="auth.register_title">Join SkillHub</h2>
+        <p class="auth-form-subtitle" data-i18n="auth.register_subtitle">Create your account to get started.</p>
+
+        <form class="auth-form" id="registerForm">
+          <div class="input-group">
+            <label data-i18n="auth.full_name">Full Name</label>
+            <input class="input" type="text" id="fullName" placeholder="Alex Rivera" data-i18n-placeholder="auth.full_name_placeholder" required>
+          </div>
+          <div class="input-group">
+            <label data-i18n="auth.email">Email address</label>
+            <input class="input" type="email" id="email" placeholder="example@gmail.com" data-i18n-placeholder="auth.email_placeholder" required>
+          </div>
+          <div class="input-group">
+            <label data-i18n="auth.password">Password</label>
+            <input class="input" type="password" id="password" placeholder="********" required>
+            <div class="password-rules">
+              <p class="text-xs font-semibold" data-i18n="auth.password_rules">Password must contain:</p>
+              <div class="password-rule" id="ruleLength"><span class="icon">❌</span> <span data-i18n="auth.rule_length">At least 8 characters</span></div>
+              <div class="password-rule" id="ruleLetter"><span class="icon">❌</span> <span data-i18n="auth.rule_letter">At least one letter</span></div>
+              <div class="password-rule" id="ruleSymbol"><span class="icon">❌</span> <span data-i18n="auth.rule_symbol">At least one symbol</span></div>
+            </div>
+          </div>
+          <div id="errorMsg" class="text-danger text-sm" style="display:none"></div>
+          <button type="submit" class="btn btn-primary btn-full btn-lg" data-i18n="auth.create_account">Create Account</button>
+        </form>
+
+        <p class="auth-footer">
+          <span data-i18n="auth.has_account">Already have an account?</span>
+          <a href="login.html" data-i18n="auth.sign_in">Sign in</a>
+        </p>
+      </div>
+    </div>
+    <div class="auth-right">
+      <div class="auth-right-content">
+        <h2>Start your journey</h2>
+        <p>Join thousands of developers showcasing their work on SkillHub.</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../js/utils.js"></script>
+  <script src="../../js/i18n.js"></script>
+  <script src="../../js/supabase.js"></script>
+  <script src="../../js/auth.js"></script>
+  <script src="../../js/ui.js"></script>
+  <script src="../../js/pages.js"></script>
+  <script>
+    (async function() {
+      var langs = ['uz','en','ru'];
+      for (var i = 0; i < langs.length; i++) {
+        var res = await fetch('../../i18n/' + langs[i] + '.json');
+        App.i18n.load(langs[i], await res.json());
+      }
+      App.pages.seedDemoData();
+      App.pages.initAuthPage();
+
+      if (App.auth.isLoggedIn()) {
+        window.location.href = '../main/dashboard.html';
+        return;
+      }
+
+      var form = document.getElementById('registerForm');
+      var passwordInput = document.getElementById('password');
+      var errorMsg = document.getElementById('errorMsg');
+
+      passwordInput.addEventListener('input', function() {
+        var v = this.value;
+        toggleRule('ruleLength', v.length >= 8);
+        toggleRule('ruleLetter', /[a-zA-Z]/.test(v));
+        toggleRule('ruleSymbol', /[^a-zA-Z0-9]/.test(v));
+      });
+
+      function toggleRule(id, valid) {
+        var el = document.getElementById(id);
+        el.classList.toggle('valid', valid);
+        el.querySelector('.icon').textContent = valid ? '✅' : '❌';
+      }
+
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        var result = App.auth.register({
+          fullName: document.getElementById('fullName').value,
+          email: document.getElementById('email').value.trim(),
+          password: passwordInput.value
+        });
+        if (result.error) {
+          errorMsg.textContent = result.error;
+          errorMsg.style.display = 'block';
+        } else {
+          window.location.href = 'login.html';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

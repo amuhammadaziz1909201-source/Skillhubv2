@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillHub — Community</title>
+  <link rel="icon" href="../../assets/icons/icon-192.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/variables.css">
+  <link rel="stylesheet" href="../../css/reset.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/utilities.css">
+  <link rel="stylesheet" href="../../css/layout.css">
+  <link rel="stylesheet" href="../../css/pages.css">
+</head>
+<body>
+  <div class="layout">
+    <aside class="sidebar"></aside>
+    <div class="sidebar-overlay"></div>
+    <div class="main-content">
+      <header class="topbar"></header>
+      <main class="page-content">
+        <div class="page-header">
+          <h2 data-i18n="community.title">Community</h2>
+          <p data-i18n="community.desc">Connect with developers and designers.</p>
+        </div>
+
+        <div class="grid grid-3 gap-4" id="membersGrid"></div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../../js/utils.js"></script>
+  <script src="../../js/i18n.js"></script>
+  <script src="../../js/supabase.js"></script>
+  <script src="../../js/auth.js"></script>
+  <script src="../../js/ui.js"></script>
+  <script src="../../js/nav.js"></script>
+  <script src="../../js/pages.js"></script>
+  <script>
+    (async function() {
+      var langs = ['uz','en','ru'];
+      for (var i = 0; i < langs.length; i++) {
+        var res = await fetch('../../i18n/' + langs[i] + '.json');
+        App.i18n.load(langs[i], await res.json());
+      }
+      if (!App.auth.requireAuth()) return;
+      App.pages.initLayout({ activePage: 'community', title: App.t('nav.community') });
+
+      var currentUser = App.auth.getCurrentUser();
+      var users = App.db.getUsers().filter(function(u) { return u.id !== currentUser.id; });
+      var grid = document.getElementById('membersGrid');
+
+      users.forEach(function(u) {
+        var card = document.createElement('div');
+        card.className = 'card text-center';
+        var avatarHtml = u.avatar ?
+          '<img src="' + u.avatar + '" style="width:64px;height:64px;border-radius:50%;object-fit:cover">' :
+          '<div class="avatar avatar-lg mx-auto">' + App.utils.getInitials(u.fullName) + '</div>';
+
+        card.innerHTML = avatarHtml +
+          '<h4 class="mt-4 mb-1">' + App.utils.sanitize(u.fullName) + '</h4>' +
+          '<p class="text-sm text-secondary mb-1">' + App.utils.sanitize(u.email) + '</p>' +
+          '<p class="text-xs text-tertiary mb-4">' + App.utils.sanitize(u.bio || 'Developer') + '</p>' +
+          '<div class="flex gap-2 justify-center flex-wrap mb-4">' +
+          (u.skills || []).slice(0, 3).map(function(s) { return '<span class="badge badge-primary">' + App.utils.sanitize(s) + '</span>'; }).join('') +
+          '</div>' +
+          '<div class="flex gap-2 justify-center">' +
+          '<button class="btn btn-primary btn-sm follow-toggle">' + App.t('community.follow') + '</button>' +
+          '<a href="profile.html?user=' + u.id + '" class="btn btn-outline btn-sm">' + App.t('community.share') + '</a>' +
+          '</div>';
+        grid.appendChild(card);
+      });
+
+      if (users.length === 0) {
+        grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="icon">👥</div><h3>No other users yet</h3></div>';
+      }
+
+      grid.addEventListener('click', function(e) {
+        var btn = e.target.closest('.follow-toggle');
+        if (!btn) return;
+        if (btn.textContent === App.t('community.follow')) {
+          btn.textContent = App.t('community.unfollow');
+          btn.className = 'btn btn-secondary btn-sm follow-toggle';
+        } else {
+          btn.textContent = App.t('community.follow');
+          btn.className = 'btn btn-primary btn-sm follow-toggle';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

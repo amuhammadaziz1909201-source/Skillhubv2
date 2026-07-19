@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkillHub — Portfolio Platform</title>
+  <link rel="icon" href="assets/icons/icon-192.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/utilities.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/pages.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#3525CD">
+</head>
+<body>
+  <header class="landing-header">
+    <div class="landing-nav">
+      <a href="#" style="font-weight:700;font-size:var(--text-lg);color:var(--primary)">SkillHub <sup style="font-size:10px;color:var(--text-tertiary)">BETA</sup></a>
+      <a href="#features" data-i18n="landing.feat1_title">Modern UI</a>
+      <a href="#how" data-i18n="landing.how_title">How it works</a>
+    </div>
+    <div class="flex gap-3 items-center">
+      <select class="input" style="width:auto;padding:0.3rem 0.6rem;font-size:var(--text-xs)" data-lang-select>
+        <option value="uz">UZ</option>
+        <option value="en">EN</option>
+        <option value="ru">RU</option>
+      </select>
+      <a href="pages/auth/login.html" class="btn btn-ghost" data-guest-only data-i18n="auth.sign_in">Sign in</a>
+      <a href="pages/auth/login.html" class="btn btn-primary" data-auth-only style="display:none" data-i18n="nav.dashboard">Dashboard</a>
+      <a href="pages/auth/register.html" class="btn btn-primary" data-guest-only data-i18n="auth.sign_up">Sign up</a>
+    </div>
+  </header>
+
+  <section class="landing-hero" id="hero">
+    <h1 data-i18n="landing.hero_title">The best portfolio platform for developers and designers</h1>
+    <p data-i18n="landing.hero_desc">Showcase your work professionally, join a global community, and find your dream projects.</p>
+    <div class="flex gap-4 justify-center">
+      <a href="pages/auth/register.html" class="btn btn-primary btn-lg" data-guest-only data-i18n="landing.cta_start">Get started free</a>
+      <a href="pages/main/portfolio.html" class="btn btn-outline btn-lg" data-i18n="landing.cta_explore">Browse projects</a>
+    </div>
+  </section>
+
+  <section class="landing-features" id="features">
+    <div class="text-center mb-8">
+      <h2 data-i18n="landing.why_title">Why SkillHub?</h2>
+      <p class="text-secondary mt-2" data-i18n="landing.why_desc">All the tools you need for your career in one place</p>
+    </div>
+    <div class="grid grid-3 gap-6" style="max-width:1000px;margin:0 auto">
+      <div class="card text-center">
+        <div style="font-size:2rem;margin-bottom:var(--space-4)">🎨</div>
+        <h4 data-i18n="landing.feat1_title">Modern UI</h4>
+        <p class="text-secondary text-sm mt-2" data-i18n="landing.feat1_desc">Present your work with modern design.</p>
+      </div>
+      <div class="card text-center">
+        <div style="font-size:2rem;margin-bottom:var(--space-4)">🔗</div>
+        <h4 data-i18n="landing.feat2_title">Easy sharing</h4>
+        <p class="text-secondary text-sm mt-2" data-i18n="landing.feat2_desc">Share your portfolio with just one link.</p>
+      </div>
+      <div class="card text-center">
+        <div style="font-size:2rem;margin-bottom:var(--space-4)">🌍</div>
+        <h4 data-i18n="landing.feat3_title">Global Community</h4>
+        <p class="text-secondary text-sm mt-2" data-i18n="landing.feat3_desc">Connect with developers worldwide.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="landing-features" id="how" style="background:var(--bg-secondary)">
+    <div class="text-center mb-8">
+      <h2 data-i18n="landing.how_title">How does SkillHub work?</h2>
+    </div>
+    <div class="grid grid-3 gap-6" style="max-width:1000px;margin:0 auto">
+      <div class="card text-center">
+        <div class="badge badge-primary" style="font-size:var(--text-lg);width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:var(--space-4)">1</div>
+        <h4 data-i18n="landing.step1_title">Create a profile</h4>
+        <p class="text-secondary text-sm mt-2" data-i18n="landing.step1_desc">Build your professional brand.</p>
+      </div>
+      <div class="card text-center">
+        <div class="badge badge-primary" style="font-size:var(--text-lg);width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:var(--space-4)">2</div>
+        <h4 data-i18n="landing.step2_title">Add projects</h4>
+        <p class="text-secondary text-sm mt-2" data-i18n="landing.step2_desc">Upload your best work.</p>
+      </div>
+      <div class="card text-center">
+        <div class="badge badge-primary" style="font-size:var(--text-lg);width:40px;height:40px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:var(--space-4)">3</div>
+        <h4 data-i18n="landing.step3_title">Get noticed</h4>
+        <p class="text-secondary text-sm mt-2" data-i18n="landing.step3_desc">Get reviews and discover opportunities.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="landing-features" id="stats">
+    <div class="grid grid-4 gap-6 text-center" style="max-width:800px;margin:0 auto">
+      <div><h2 data-counter="50000">0</h2><p class="text-secondary text-sm font-semibold" data-i18n="landing.stats_devs">DEVELOPERS</p></div>
+      <div><h2 data-counter="120000">0</h2><p class="text-secondary text-sm font-semibold" data-i18n="landing.stats_projects">PROJECTS</p></div>
+      <div><h2 data-counter="1000000">0</h2><p class="text-secondary text-sm font-semibold" data-i18n="landing.stats_likes">LIKES</p></div>
+      <div><h2 data-counter="500">0</h2><p class="text-secondary text-sm font-semibold" data-i18n="landing.stats_companies">COMPANIES</p></div>
+    </div>
+  </section>
+
+  <section class="landing-features" style="background:var(--primary);text-align:center;color:white">
+    <h2 style="color:white;margin-bottom:var(--space-4)" data-i18n="landing.cta_final_title">Build your future today</h2>
+    <p style="opacity:0.85;margin-bottom:var(--space-8)" data-i18n="landing.cta_final_desc">Join the SkillHub community. Free and fast.</p>
+    <a href="pages/auth/register.html" class="btn btn-lg" style="background:white;color:var(--primary)" data-guest-only data-i18n="landing.cta_start">Get started free</a>
+  </section>
+
+  <footer class="landing-footer">
+    <div class="landing-footer-content">
+      <p class="text-secondary text-sm" data-i18n="landing.footer_copy">© 2026 SkillHub. All rights reserved.</p>
+      <div class="flex gap-4">
+        <a href="#" class="text-secondary text-sm">About</a>
+        <a href="#" class="text-secondary text-sm">Support</a>
+        <a href="#" class="text-secondary text-sm">Twitter</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="js/utils.js"></script>
+  <script src="js/i18n.js"></script>
+  <script src="js/supabase.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/pages.js"></script>
+  <script>
+    (async function() {
+      var langs = ['uz','en','ru'];
+      for (var i = 0; i < langs.length; i++) {
+        var res = await fetch('i18n/' + langs[i] + '.json');
+        App.i18n.load(langs[i], await res.json());
+      }
+      App.pages.seedDemoData();
+      App.pages.initLanding();
+
+      document.querySelector('[data-lang-select]').value = App.i18n.getLang();
+      document.querySelector('[data-lang-select]').addEventListener('change', function() {
+        App.i18n.setLang(this.value);
+      });
+
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(function() {});
+      }
+    })();
+  </script>
+</body>
+</html>
