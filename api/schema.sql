@@ -176,11 +176,17 @@ insert into storage.buckets (id, name, public) values ('project-images', 'projec
 insert into storage.buckets (id, name, public) values ('site-backups', 'site-backups', true) on conflict (id) do nothing;
 
 -- Storage policies
+drop policy if exists "Avatar uploads" on storage.objects;
 create policy "Avatar uploads" on storage.objects for all using (bucket_id = 'avatars');
+drop policy if exists "Project image uploads" on storage.objects;
 create policy "Project image uploads" on storage.objects for all using (bucket_id = 'project-images');
+drop policy if exists "Site backups write" on storage.objects;
 create policy "Site backups write" on storage.objects for all using (bucket_id = 'site-backups');
+drop policy if exists "Avatar public read" on storage.objects;
 create policy "Avatar public read" on storage.objects for select using (bucket_id = 'avatars');
+drop policy if exists "Project images public read" on storage.objects;
 create policy "Project images public read" on storage.objects for select using (bucket_id = 'project-images');
+drop policy if exists "Site backups read" on storage.objects;
 create policy "Site backups read" on storage.objects for select using (bucket_id = 'site-backups');
 
 -- Migration: add job_role and location to profiles
