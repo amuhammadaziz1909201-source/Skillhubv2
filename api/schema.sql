@@ -192,3 +192,6 @@ create policy "Site backups read" on storage.objects for select using (bucket_id
 -- Migration: add job_role and location to profiles
 alter table profiles add column if not exists job_role text default '';
 alter table profiles add column if not exists location text default '';
+alter table profiles add column if not exists jobs text[] default '{}';
+alter table profiles add column if not exists location_lat double precision default null;
+alter table profiles add column if not exists location_lng double precision default null;
