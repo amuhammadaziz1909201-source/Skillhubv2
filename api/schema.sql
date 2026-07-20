@@ -173,12 +173,15 @@ create trigger projects_updated_at before update on projects for each row execut
 -- Run these in SQL Editor if buckets don't exist:
 insert into storage.buckets (id, name, public) values ('avatars', 'avatars', true) on conflict (id) do nothing;
 insert into storage.buckets (id, name, public) values ('project-images', 'project-images', true) on conflict (id) do nothing;
+insert into storage.buckets (id, name, public) values ('site-backups', 'site-backups', true) on conflict (id) do nothing;
 
 -- Storage policies
 create policy "Avatar uploads" on storage.objects for all using (bucket_id = 'avatars');
 create policy "Project image uploads" on storage.objects for all using (bucket_id = 'project-images');
+create policy "Site backups write" on storage.objects for all using (bucket_id = 'site-backups');
 create policy "Avatar public read" on storage.objects for select using (bucket_id = 'avatars');
 create policy "Project images public read" on storage.objects for select using (bucket_id = 'project-images');
+create policy "Site backups read" on storage.objects for select using (bucket_id = 'site-backups');
 
 -- Migration: add job_role and location to profiles
 alter table profiles add column if not exists job_role text default '';

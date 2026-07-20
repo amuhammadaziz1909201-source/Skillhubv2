@@ -52,6 +52,7 @@
         <div class="tabs mb-6">
           <button class="tab active" data-atab="users" data-i18n="admin.users">Users</button>
           <button class="tab" data-atab="projects" data-i18n="admin.projects">Projects</button>
+          <button class="tab" data-atab="backups">Backups</button>
         </div>
 
         <div id="panel-users">
@@ -87,6 +88,25 @@
             </table>
           </div>
         </div>
+
+        <div id="panel-backups" style="display:none">
+          <div class="grid grid-2 gap-4 mb-6">
+            <div class="card">
+              <h3 class="mb-2"><i class="fas fa-cloud-upload-alt text-primary"></i> Backup Now</h3>
+              <p class="text-secondary text-sm mb-4">All site data will be saved to Supabase Storage</p>
+              <button class="btn btn-primary" id="btnBackupNow"><i class="fas fa-sync"></i> Backup Now</button>
+            </div>
+            <div class="card">
+              <h3 class="mb-2"><i class="fas fa-cloud-download-alt text-success"></i> Restore from Backup</h3>
+              <p class="text-secondary text-sm mb-4">Restore all data from the latest Storage backup</p>
+              <button class="btn btn-danger" id="btnRestore"><i class="fas fa-undo"></i> Restore All Data</button>
+            </div>
+          </div>
+          <div class="card">
+            <h3 class="mb-4"><i class="fas fa-database text-primary"></i> Backup Files</h3>
+            <div id="backupFiles" class="text-secondary">Loading...</div>
+          </div>
+        </div>
       </main>
     </div>
   </div>
@@ -95,6 +115,7 @@
   <script src="../../js/utils.js"></script>
   <script src="../../js/i18n.js"></script>
   <script src="../../js/supabase.js"></script>
+  <script src="../../js/storage-manager.js"></script>
   <script src="../../js/auth.js"></script>
   <script src="../../js/ui.js"></script>
   <script src="../../js/nav.js"></script>
@@ -108,6 +129,7 @@
       }
       if (!App.auth.requireAdmin()) return;
       App.initSupabase();
+      App.StorageManager.init();
       App.auth.init();
       await App.pages.initLayout({ activePage: 'admin', title: App.t('admin.title') });
 
@@ -169,6 +191,10 @@
         });
       }
 
+      await renderUsers();
+      await renderProjects();
+
+      // Tab switching logic
       document.querySelectorAll('[data-atab]').forEach(function(tab) {
         tab.addEventListener('click', async function() {
           document.querySelectorAll('[data-atab]').forEach(function(t) { t.classList.remove('active'); });
@@ -176,11 +202,55 @@
           var id = this.getAttribute('data-atab');
           document.getElementById('panel-users').style.display = id === 'users' ? '' : 'none';
           document.getElementById('panel-projects').style.display = id === 'projects' ? '' : 'none';
+          document.getElementById('panel-backups').style.display = id === 'backups' ? '' : 'none';
+          if (id === 'backups') await loadBackupFiles();
         });
       });
 
-      await renderUsers();
-      await renderProjects();
+      async function loadBackupFiles() {
+        var container = document.getElementById('backupFiles');
+        container.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+        App.StorageManager.init();
+        var info = await App.StorageManager.getBackupInfo();
+        if (!info || !info.length) {
+          container.innerHTML = '<p>No backups found. Click "Backup Now" to create one.</p>';
+          return;
+        }
+        var html = '<table><thead><tr><th>File</th><th>Size</th><th>Created</th></tr></thead><tbody>';
+        info.forEach(function(f) {
+          html += '<tr><td class="font-semibold">' + f.name + '</td><td>' + (f.size ? (f.size / 1024).toFixed(1) + ' KB' : '-') + '</td><td class="text-secondary">' + App.utils.formatDate(f.created) + '</td></tr>';
+        });
+        html += '</tbody></table>';
+        container.innerHTML = html;
+      }
+
+      document.getElementById('btnBackupNow').addEventListener('click', async function() {
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Backing up...';
+        this.disabled = true;
+        await App.StorageManager.syncNow();
+        await loadBackupFiles();
+        this.innerHTML = '<i class="fas fa-sync"></i> Backup Now';
+        this.disabled = false;
+        App.toast.show('Backup complete!', 'success');
+      });
+
+      document.getElementById('btnRestore').addEventListener('click', async function() {
+        App.modal.confirm('Restore all data from backup? This will overwrite current data.', async function() {
+          var btn = document.getElementById('btnRestore');
+          btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Restoring...';
+          btn.disabled = true;
+          var result = await App.StorageManager.restoreAll();
+          btn.innerHTML = '<i class="fas fa-undo"></i> Restore All Data';
+          btn.disabled = false;
+          if (result.success) {
+            App.toast.show(result.message + ' Profiles: ' + result.restored.profiles + ', Projects: ' + result.restored.projects, 'success');
+            await renderUsers();
+            await renderProjects();
+          } else {
+            App.toast.show(result.message, 'error');
+          }
+        });
+      });
     })();
   </script>
 </body>

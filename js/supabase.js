@@ -45,6 +45,7 @@ App.db = {
   saveProfile: async function(profile) {
     if (App.isSupabase()) {
       var res = await App.sb.from('profiles').upsert(profile, { onConflict: 'id' });
+      if (!res.error) this._triggerSync();
       return res.error ? null : profile;
     }
     var users = this.getUsers();
@@ -57,6 +58,7 @@ App.db = {
   updateProfile: async function(id, updates) {
     if (App.isSupabase()) {
       var res = await App.sb.from('profiles').update(updates).eq('id', id);
+      if (!res.error) this._triggerSync();
       return !res.error;
     }
     var users = this.getUsers();
@@ -68,6 +70,7 @@ App.db = {
   deleteProfile: async function(id) {
     if (App.isSupabase()) {
       var res = await App.sb.from('profiles').delete().eq('id', id);
+      if (!res.error) this._triggerSync();
       return !res.error;
     }
     var users = this.getUsers().filter(function(u) { return u.id !== id; });
@@ -126,6 +129,7 @@ App.db = {
       var res = await App.sb.from('projects').upsert(sbProject, { onConflict: 'id' });
       if (res.error) return null;
       var saved = res.data ? res.data[0] : sbProject;
+      this._triggerSync();
       return {
         id: saved.id, userId: saved.user_id, title: saved.title, description: saved.description,
         tags: saved.tags || [], image: saved.image, projectUrl: saved.project_url,
@@ -144,6 +148,7 @@ App.db = {
   deleteProject: async function(id) {
     if (App.isSupabase()) {
       var res = await App.sb.from('projects').delete().eq('id', id);
+      if (!res.error) this._triggerSync();
       return !res.error;
     }
     var projects = this.getProjects().filter(function(p) { return p.id !== id; });
@@ -194,6 +199,7 @@ App.db = {
         read: false
       }).select().single();
       if (res.error) return null;
+      this._triggerSync();
       return { id: res.data.id, userId: res.data.user_id, message: res.data.message, type: res.data.type, read: res.data.read, createdAt: res.data.created_at };
     }
     var list = this._getStore('sh_notifications');
@@ -206,6 +212,7 @@ App.db = {
   markNotificationRead: async function(id) {
     if (App.isSupabase()) {
       await App.sb.from('notifications').update({ read: true }).eq('id', id);
+      this._triggerSync();
       return;
     }
     var list = this._getStore('sh_notifications');
@@ -218,6 +225,7 @@ App.db = {
       var user = App.auth.getCurrentUser();
       if (!user) return;
       await App.sb.from('notifications').update({ read: true }).eq('user_id', user.id).eq('read', false);
+      this._triggerSync();
       return;
     }
     var list = this._getStore('sh_notifications');
@@ -230,6 +238,7 @@ App.db = {
       var user = App.auth.getCurrentUser();
       if (!user) return;
       await App.sb.from('notifications').delete().eq('user_id', user.id);
+      this._triggerSync();
       return;
     }
     this._setStore('sh_notifications', []);
@@ -238,6 +247,13 @@ App.db = {
   // ==================== SETTINGS (localStorage only) ====================
   getSettings: function() { return this._getObj('sh_settings'); },
   saveSettings: function(s) { this._setStore('sh_settings', s); },
+
+  // ==================== STORAGE SYNC ====================
+  _triggerSync: function() {
+    if (App.StorageManager) {
+      App.StorageManager.debounceSync();
+    }
+  },
 
   // ==================== HELPERS ====================
   _getStore: function(name) {
