@@ -49,7 +49,7 @@
       if (!App.auth.requireAuth()) return;
       App.initSupabase();
       App.auth.init();
-      App.pages.initLayout({ activePage: 'community', title: App.t('nav.community') });
+      await App.pages.initLayout({ activePage: 'community', title: App.t('nav.community') });
 
       var currentUser = App.auth.getCurrentUser();
       var users = (await App.db.getProfiles()).filter(function(u) { return u.id !== currentUser.id; });

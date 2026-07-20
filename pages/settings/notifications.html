@@ -59,7 +59,7 @@
       if (!App.auth.requireAuth()) return;
       App.initSupabase();
       App.auth.init();
-      App.pages.initLayout({ activePage: 'notifications', title: App.t('nav.notifications') });
+      await App.pages.initLayout({ activePage: 'notifications', title: App.t('nav.notifications') });
 
       async function render() {
         var list = await App.db.getNotifications();

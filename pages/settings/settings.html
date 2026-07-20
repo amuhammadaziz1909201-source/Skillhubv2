@@ -111,7 +111,7 @@
       if (!App.auth.requireAuth()) return;
       App.initSupabase();
       App.auth.init();
-      App.pages.initLayout({ activePage: 'settings', title: App.t('settings.title') });
+      await App.pages.initLayout({ activePage: 'settings', title: App.t('settings.title') });
 
       var settings = App.db.getSettings();
 

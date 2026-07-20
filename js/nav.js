@@ -87,10 +87,10 @@ App.nav = {
     });
   },
 
-  renderSidebar: function(activePage) {
+  renderSidebar: function(activePage, notifCount) {
     var user = App.auth.getCurrentUser();
     var isAdmin = App.auth.isAdmin();
-    var notifCount = App.db.getNotifications().filter(function(n) { return !n.read; }).length;
+    notifCount = notifCount || 0;
 
     var mainLinks = [
       { href: '../main/dashboard.html', icon: 'dashboard', label: App.t('nav.dashboard'), key: 'dashboard' },
@@ -113,7 +113,6 @@ App.nav = {
     mainLinks.forEach(function(l) {
       html += '<a href="' + l.href + '" class="sidebar-link' + (activePage === l.key ? ' active' : '') + '">';
       html += '<span class="icon"><i class="material-icons">' + l.icon + '</i></span><span>' + l.label + '</span>';
-      if (l.badge) html += '<span class="badge">' + l.badge + '</span>';
       html += '</a>';
     });
     html += '</div><div class="sidebar-section"><div class="sidebar-section-title">' + App.t('nav.account') + '</div>';
@@ -148,7 +147,6 @@ App.nav = {
 
   renderTopbar: function(title) {
     var user = App.auth.getCurrentUser();
-    var notifCount = App.db.getNotifications().filter(function(n) { return !n.read; }).length;
 
     var html = '<div class="topbar-left">';
     html += '<button class="mobile-menu-btn btn-icon"><i class="material-icons">menu</i></button>';
@@ -158,7 +156,6 @@ App.nav = {
     html += '<input type="text" placeholder="' + App.t('nav.search_placeholder') + ' (Ctrl+K)"></div>';
     html += '<button class="btn-icon btn-ghost" data-theme-toggle title="' + App.t('nav.toggle_theme') + '"><i class="material-icons">dark_mode</i></button>';
     html += '<a href="../settings/notifications.html" class="btn-icon btn-ghost" style="position:relative"><i class="material-icons">notifications</i>';
-    if (notifCount > 0) html += '<span style="position:absolute;top:2px;right:2px;width:8px;height:8px;background:var(--danger);border-radius:50%"></span>';
     html += '</a>';
     html += '<div class="dropdown"><button class="btn-icon btn-ghost" data-dropdown><i class="material-icons">account_circle</i></button>';
     html += '<div class="dropdown-menu">';

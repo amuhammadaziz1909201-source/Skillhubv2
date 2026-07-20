@@ -101,7 +101,7 @@
       App.initSupabase();
       App.auth.init();
       if (!App.auth.requireAuth()) return;
-      App.pages.initLayout({ activePage: 'portfolio', title: App.t('nav.portfolio') });
+      await App.pages.initLayout({ activePage: 'portfolio', title: App.t('nav.portfolio') });
 
       var user = App.auth.getCurrentUser();
       var currentView = 'all';

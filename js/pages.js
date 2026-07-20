@@ -1,11 +1,18 @@
 window.App = window.App || {};
 
 App.pages = {
-  initLayout: function(opts) {
+  initLayout: async function(opts) {
     opts = opts || {};
     var lang = App.i18n.getLang();
     App.i18n.setLang(lang);
-    App.nav.renderSidebar(opts.activePage || '');
+
+    var notifCount = 0;
+    try {
+      var notifs = await App.db.getNotifications();
+      notifCount = notifs.filter(function(n) { return !n.read; }).length;
+    } catch(e) {}
+
+    App.nav.renderSidebar(opts.activePage || '', notifCount);
     App.nav.renderTopbar(opts.title || '');
     App.nav.init();
 
@@ -54,9 +61,10 @@ App.pages = {
   },
 
   seedDemoData: async function() {
-    var users = await App.db.getProfiles();
-    if (users.length > 0) return;
     if (App.isSupabase()) return;
+
+    var users = this._getStore('sh_users');
+    if (users.length > 0) return;
 
     var demoUsers = [
       { id:'u1', firstName:'Alex', lastName:'Rivera', fullName:'Alex Rivera', email:'alex@skillhub.com', password:'Admin@123', avatar:'', bio:'Full-stack developer passionate about clean UI.', role:'admin', skills:['React','Node.js','TypeScript'], links:{github:'alexrivera'}, createdAt:'2025-01-15T10:00:00Z' },
@@ -77,5 +85,9 @@ App.pages = {
       { message:'Your profile is 80% complete.', type:'warning', read:false },
     ];
     notifs.forEach(function(n) { App.db.addNotification(n); });
+  },
+
+  _getStore: function(name) {
+    try { return JSON.parse(localStorage.getItem(name) || '[]'); } catch(e) { return []; }
   }
 };

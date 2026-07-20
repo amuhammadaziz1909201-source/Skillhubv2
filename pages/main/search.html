@@ -61,7 +61,7 @@
       if (!App.auth.requireAuth()) return;
       App.initSupabase();
       App.auth.init();
-      App.pages.initLayout({ activePage: 'search', title: App.t('nav.search') });
+      await App.pages.initLayout({ activePage: 'search', title: App.t('nav.search') });
 
       var currentFilter = 'all';
 

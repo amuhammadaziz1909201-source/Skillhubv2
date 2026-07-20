@@ -109,7 +109,7 @@
       if (!App.auth.requireAdmin()) return;
       App.initSupabase();
       App.auth.init();
-      App.pages.initLayout({ activePage: 'admin', title: App.t('admin.title') });
+      await App.pages.initLayout({ activePage: 'admin', title: App.t('admin.title') });
 
       async function renderUsers() {
         var users = await App.db.getProfiles();

@@ -97,7 +97,7 @@
       App.auth.init();
       if (!App.auth.requireAuth()) return;
 
-      App.pages.initLayout({ activePage: 'dashboard', title: App.t('nav.dashboard') });
+      await App.pages.initLayout({ activePage: 'dashboard', title: App.t('nav.dashboard') });
 
       var user = App.auth.getCurrentUser();
       var firstName = user ? user.firstName || user.fullName.split(' ')[0] : '';

@@ -81,7 +81,7 @@
       if (!App.auth.requireAuth()) return;
       App.initSupabase();
       App.auth.init();
-      App.pages.initLayout({ activePage: 'profile', title: App.t('nav.profile') });
+      await App.pages.initLayout({ activePage: 'profile', title: App.t('nav.profile') });
 
       var user = App.auth.getCurrentUser();
       document.getElementById('userName').textContent = user.fullName;
