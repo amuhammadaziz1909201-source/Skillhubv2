@@ -480,6 +480,8 @@
         App.auth.setCurrentUser(user);
         App.db.saveUser(user);
 
+        if (App.StorageManager) App.StorageManager.debounceSync();
+
         btn.disabled = false;
         btn.innerHTML = '<i class="fas fa-check"></i> Save Profile';
         App.toast('Profile saved!', 'success');
