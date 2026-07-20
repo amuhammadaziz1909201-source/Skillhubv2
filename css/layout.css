@@ -203,6 +203,13 @@
 .topbar-search i { color: var(--text-tertiary); transition: color var(--transition); }
 .topbar-search:focus-within i { color: var(--primary); }
 
+.topbar-notif-link:hover {
+  background: var(--bg-tertiary);
+  color: var(--text) !important;
+  transform: scale(1.05);
+}
+.topbar-notif-link:active { transform: scale(0.95); }
+
 .page-content {
   flex: 1;
   padding: var(--space-8) var(--space-6);

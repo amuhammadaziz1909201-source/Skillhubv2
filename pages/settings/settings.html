@@ -22,71 +22,118 @@
       <header class="topbar"></header>
       <main class="page-content">
         <div class="page-header">
-          <h2 data-i18n="settings.title">Settings</h2>
+          <h2><i class="fas fa-gear" style="margin-right:8px;font-size:0.85em"></i> Settings</h2>
         </div>
 
         <div class="tabs mb-8">
-          <button class="tab active" data-stab="security" data-i18n="settings.security">Security</button>
-          <button class="tab" data-stab="preferences" data-i18n="settings.preferences">Preferences</button>
+          <button class="tab active" data-stab="profile"><i class="fas fa-user" style="margin-right:6px"></i> Profile</button>
+          <button class="tab" data-stab="preferences"><i class="fas fa-palette" style="margin-right:6px"></i> Preferences</button>
+          <button class="tab" data-stab="security"><i class="fas fa-lock" style="margin-right:6px"></i> Security</button>
         </div>
 
-        <div id="tab-security" class="card" style="max-width:640px">
-          <h3 class="mb-6" data-i18n="settings.security">Security</h3>
-          <div class="flex flex-col gap-6">
-            <div class="input-group">
-              <label data-i18n="settings.current_password">Current Password</label>
-              <input class="input" type="password" id="currentPass" placeholder="********">
+        <!-- ====== PROFILE TAB ====== -->
+        <div id="tab-profile">
+          <div class="card mb-6" style="max-width:700px">
+            <h3 class="mb-6"><i class="fas fa-user-pen" style="margin-right:8px;font-size:0.9em"></i> Edit Profile</h3>
+
+            <div class="flex gap-6 items-start mb-6 flex-wrap">
+              <div style="position:relative">
+                <div id="avatarPreview" class="avatar avatar-xl" style="cursor:pointer;border:3px solid var(--border);overflow:hidden"></div>
+                <label for="avatarInput" style="position:absolute;bottom:0;right:0;width:32px;height:32px;background:var(--primary);color:white;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:var(--shadow-md);transition:transform 0.2s" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                  <i class="fas fa-camera" style="font-size:12px"></i>
+                </label>
+                <input type="file" id="avatarInput" accept="image/*" style="display:none">
+              </div>
+              <div style="flex:1;min-width:200px">
+                <p class="text-sm text-secondary mb-2">Upload a profile picture</p>
+                <p class="text-xs text-tertiary">JPG, PNG or GIF. Max 2MB.</p>
+                <button class="btn btn-ghost btn-sm mt-2" id="removeAvatarBtn" style="color:var(--danger);display:none"><i class="fas fa-trash" style="margin-right:4px"></i> Remove</button>
+              </div>
             </div>
-            <div class="input-group">
-              <label data-i18n="settings.new_password">New Password</label>
-              <input class="input" type="password" id="newPass" placeholder="********">
-            </div>
-            <div class="input-group">
-              <label data-i18n="settings.confirm_password">Confirm Password</label>
-              <input class="input" type="password" id="confirmPass" placeholder="********">
-            </div>
-            <div>
-              <button class="btn btn-primary" id="updatePassBtn" data-i18n="settings.update_password">Update Password</button>
+
+            <form id="profileForm" class="flex flex-col gap-5">
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)">
+                <div class="input-group">
+                  <label><i class="fas fa-user" style="margin-right:4px;font-size:0.85em"></i> First Name</label>
+                  <input class="input" type="text" id="firstName" placeholder="John">
+                </div>
+                <div class="input-group">
+                  <label><i class="fas fa-user" style="margin-right:4px;font-size:0.85em"></i> Last Name</label>
+                  <input class="input" type="text" id="lastName" placeholder="Doe">
+                </div>
+              </div>
+              <div class="input-group">
+                <label><i class="fas fa-id-card" style="margin-right:4px;font-size:0.85em"></i> Full Name</label>
+                <input class="input" type="text" id="fullName" placeholder="John Doe">
+              </div>
+              <div class="input-group">
+                <label><i class="fas fa-align-left" style="margin-right:4px;font-size:0.85em"></i> Bio</label>
+                <textarea class="input" id="bio" rows="3" placeholder="Tell us about yourself..." style="resize:vertical"></textarea>
+              </div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)">
+                <div class="input-group">
+                  <label><i class="fas fa-briefcase" style="margin-right:4px;font-size:0.85em"></i> Job / Role</label>
+                  <input class="input" type="text" id="jobRole" placeholder="Frontend Developer">
+                </div>
+                <div class="input-group">
+                  <label><i class="fas fa-location-dot" style="margin-right:4px;font-size:0.85em"></i> Location</label>
+                  <input class="input" type="text" id="location" placeholder="Tashkent, Uzbekistan">
+                </div>
+              </div>
+              <div class="input-group">
+                <label><i class="fas fa-code" style="margin-right:4px;font-size:0.85em"></i> Skills</label>
+                <input class="input" type="text" id="skills" placeholder="React, Node.js, TypeScript, CSS...">
+                <p class="text-xs text-tertiary">Comma-separated. e.g. React, Node.js, Python</p>
+              </div>
+              <div>
+                <button type="submit" class="btn btn-primary" id="saveProfileBtn">
+                  <i class="fas fa-check"></i> <span>Save Profile</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        <!-- ====== PREFERENCES TAB ====== -->
+        <div id="tab-preferences" style="display:none">
+          <div class="card" style="max-width:500px">
+            <h3 class="mb-6"><i class="fas fa-palette" style="margin-right:8px;font-size:0.9em"></i> Preferences</h3>
+            <div class="flex flex-col gap-6">
+              <div class="input-group">
+                <label><i class="fas fa-language" style="margin-right:4px;font-size:0.85em"></i> Language</label>
+                <select class="input" id="langSelect" style="max-width:300px">
+                  <option value="uz">O'zbek</option>
+                  <option value="en">English</option>
+                  <option value="ru">Русский</option>
+                </select>
+              </div>
+              <div class="input-group">
+                <label><i class="fas fa-circle-half-stroke" style="margin-right:4px;font-size:0.85em"></i> Theme</label>
+                <div class="flex gap-4 items-center">
+                  <div class="toggle" id="themeToggle"></div>
+                  <span id="themeLabel" class="text-sm"></span>
+                </div>
+              </div>
+              <button class="btn btn-primary" id="savePrefsBtn" style="align-self:flex-start"><i class="fas fa-check"></i> Save</button>
             </div>
           </div>
         </div>
 
-        <div id="tab-preferences" class="card" style="max-width:640px;display:none">
-          <h3 class="mb-6" data-i18n="settings.preferences">Preferences</h3>
-          <div class="flex flex-col gap-6">
-            <div class="input-group">
-              <label data-i18n="settings.language">Language</label>
-              <select class="input" id="langSelect" style="max-width:300px">
-                <option value="uz">O'zbek</option>
-                <option value="en">English</option>
-                <option value="ru">Русский</option>
-              </select>
-            </div>
-            <div class="input-group">
-              <label data-i18n="settings.theme">Theme</label>
-              <div class="flex gap-4 items-center">
-                <div class="toggle" id="themeToggle"></div>
-                <span id="themeLabel" class="text-sm"></span>
+        <!-- ====== SECURITY TAB ====== -->
+        <div id="tab-security" style="display:none">
+          <div class="card" style="max-width:500px">
+            <h3 class="mb-6"><i class="fas fa-shield-halved" style="margin-right:8px;font-size:0.9em"></i> Security</h3>
+            <form id="passForm" class="flex flex-col gap-5">
+              <div class="input-group">
+                <label><i class="fas fa-lock" style="margin-right:4px;font-size:0.85em"></i> New Password</label>
+                <input class="input" type="password" id="newPass" placeholder="********" required>
               </div>
-            </div>
-            <div class="input-group">
-              <label data-i18n="settings.email_notifications">Email Notifications</label>
-              <div class="flex flex-col gap-3 mt-2">
-                <div class="flex items-center gap-3">
-                  <div class="toggle active" data-notif="project_updates"></div>
-                  <span class="text-sm" data-i18n="settings.project_updates">Project updates</span>
-                </div>
-                <div class="flex items-center gap-3">
-                  <div class="toggle active" data-notif="security_alerts"></div>
-                  <span class="text-sm" data-i18n="settings.security_alerts">Security alerts</span>
-                </div>
-                <div class="flex items-center gap-3">
-                  <div class="toggle" data-notif="marketing"></div>
-                  <span class="text-sm" data-i18n="settings.marketing">Marketing</span>
-                </div>
+              <div class="input-group">
+                <label><i class="fas fa-lock" style="margin-right:4px;font-size:0.85em"></i> Confirm Password</label>
+                <input class="input" type="password" id="confirmPass" placeholder="********" required>
               </div>
-            </div>
-            <button class="btn btn-primary" id="savePrefsBtn" style="align-self:flex-start" data-i18n="common.save">Save</button>
+              <button type="submit" class="btn btn-primary"><i class="fas fa-key"></i> Update Password</button>
+            </form>
           </div>
         </div>
       </main>
@@ -108,75 +155,170 @@
         var res = await fetch('../../i18n/' + langs[i] + '.json');
         App.i18n.load(langs[i], await res.json());
       }
-      if (!App.auth.requireAuth()) return;
       App.initSupabase();
       App.auth.init();
-      await App.pages.initLayout({ activePage: 'settings', title: App.t('settings.title') });
+      if (!App.auth.requireAuth()) return;
+      await App.pages.initLayout({ activePage: 'settings', title: 'Settings' });
 
-      var settings = App.db.getSettings();
+      var user = App.auth.getCurrentUser();
+      var avatarUrl = '';
 
+      // Load profile data into form
+      async function loadProfile() {
+        if (App.isSupabase()) {
+          var res = await App.sb.from('profiles').select('*').eq('id', user.id).single();
+          if (res.data) {
+            document.getElementById('firstName').value = res.data.first_name || '';
+            document.getElementById('lastName').value = res.data.last_name || '';
+            document.getElementById('fullName').value = res.data.full_name || '';
+            document.getElementById('bio').value = res.data.bio || '';
+            document.getElementById('jobRole').value = res.data.job_role || '';
+            document.getElementById('location').value = res.data.location || '';
+            document.getElementById('skills').value = (res.data.skills || []).join(', ');
+            avatarUrl = res.data.avatar || '';
+          }
+        } else {
+          document.getElementById('firstName').value = user.firstName || '';
+          document.getElementById('lastName').value = user.lastName || '';
+          document.getElementById('fullName').value = user.fullName || '';
+          document.getElementById('bio').value = user.bio || '';
+          document.getElementById('jobRole').value = user.jobRole || '';
+          document.getElementById('location').value = user.location || '';
+          document.getElementById('skills').value = (user.skills || []).join(', ');
+          avatarUrl = user.avatar || '';
+        }
+        renderAvatar();
+      }
+
+      function renderAvatar() {
+        var el = document.getElementById('avatarPreview');
+        var removeBtn = document.getElementById('removeAvatarBtn');
+        if (avatarUrl) {
+          el.innerHTML = '<img src="' + avatarUrl + '" style="width:100%;height:100%;object-fit:cover">';
+          removeBtn.style.display = '';
+        } else {
+          el.innerHTML = '<i class="fas fa-user" style="font-size:2.5rem;color:var(--primary)"></i>';
+          removeBtn.style.display = 'none';
+        }
+      }
+
+      // Avatar upload
+      document.getElementById('avatarInput').addEventListener('change', async function(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        if (file.size > 2 * 1024 * 1024) { App.toast('Max 2MB!', 'error'); return; }
+
+        if (App.isSupabase()) {
+          var ext = file.name.split('.').pop();
+          var path = user.id + '/avatar.' + ext;
+          var res = await App.sb.storage.from('avatars').upload(path, file, { upsert: true });
+          if (res.error) { App.toast('Upload failed: ' + res.error.message, 'error'); return; }
+          var urlRes = App.sb.storage.from('avatars').getPublicUrl(path);
+          avatarUrl = urlRes.data.publicUrl + '?t=' + Date.now();
+        } else {
+          avatarUrl = URL.createObjectURL(file);
+        }
+        renderAvatar();
+        App.toast('Avatar updated!', 'success');
+      });
+
+      document.getElementById('removeAvatarBtn').addEventListener('click', function() {
+        avatarUrl = '';
+        renderAvatar();
+        document.getElementById('avatarInput').value = '';
+      });
+
+      // Save profile
+      document.getElementById('profileForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        var btn = document.getElementById('saveProfileBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner" style="width:16px;height:16px;border-width:2px"></span> Saving...';
+
+        var data = {
+          first_name: document.getElementById('firstName').value.trim(),
+          last_name: document.getElementById('lastName').value.trim(),
+          full_name: document.getElementById('fullName').value.trim(),
+          bio: document.getElementById('bio').value.trim(),
+          job_role: document.getElementById('jobRole').value.trim(),
+          location: document.getElementById('location').value.trim(),
+          skills: document.getElementById('skills').value.split(',').map(function(s) { return s.trim(); }).filter(Boolean),
+          avatar: avatarUrl
+        };
+
+        if (App.isSupabase()) {
+          var res = await App.sb.from('profiles').update(data).eq('id', user.id);
+          if (res.error) { App.toast('Error: ' + res.error.message, 'error'); btn.disabled = false; btn.innerHTML = '<i class="fas fa-check"></i> Save Profile'; return; }
+          await App.sb.auth.updateUser({ data: { full_name: data.full_name, first_name: data.first_name, last_name: data.last_name, avatar: data.avatar, bio: data.bio } });
+        }
+
+        // Update local user
+        Object.assign(user, {
+          firstName: data.first_name, lastName: data.last_name, fullName: data.full_name,
+          bio: data.bio, jobRole: data.job_role, location: data.location,
+          skills: data.skills, avatar: data.avatar
+        });
+        App.auth.setCurrentUser(user);
+        App.db.saveUser(user);
+
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-check"></i> Save Profile';
+        App.toast('Profile saved!', 'success');
+        App.nav.renderSidebar('settings');
+      });
+
+      // Tabs
       document.querySelectorAll('[data-stab]').forEach(function(tab) {
         tab.addEventListener('click', function() {
           document.querySelectorAll('[data-stab]').forEach(function(t) { t.classList.remove('active'); });
           this.classList.add('active');
           var id = this.getAttribute('data-stab');
-          document.getElementById('tab-security').style.display = id === 'security' ? '' : 'none';
+          document.getElementById('tab-profile').style.display = id === 'profile' ? '' : 'none';
           document.getElementById('tab-preferences').style.display = id === 'preferences' ? '' : 'none';
+          document.getElementById('tab-security').style.display = id === 'security' ? '' : 'none';
         });
       });
 
+      // Language
       document.getElementById('langSelect').value = App.i18n.getLang();
       document.getElementById('langSelect').addEventListener('change', function() {
         App.i18n.setLang(this.value);
-        settings.language = this.value;
-        App.db.saveSettings(settings);
+        var s = App.db.getSettings(); s.language = this.value; App.db.saveSettings(s);
       });
 
-      var themeToggle = document.getElementById('themeToggle');
+      // Theme
+      var settings = App.db.getSettings();
       var isDark = settings.theme === 'dark';
+      var themeToggle = document.getElementById('themeToggle');
       themeToggle.classList.toggle('active', isDark);
-      document.getElementById('themeLabel').textContent = isDark ? App.t('settings.dark') : App.t('settings.light');
-
+      document.getElementById('themeLabel').textContent = isDark ? 'Dark' : 'Light';
       themeToggle.addEventListener('click', function() {
         this.classList.toggle('active');
         var dark = this.classList.contains('active');
         settings.theme = dark ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-        document.getElementById('themeLabel').textContent = dark ? App.t('settings.dark') : App.t('settings.light');
+        document.getElementById('themeLabel').textContent = dark ? 'Dark' : 'Light';
         App.db.saveSettings(settings);
       });
 
-      document.querySelectorAll('.toggle[data-notif]').forEach(function(t) {
-        t.addEventListener('click', function() { this.classList.toggle('active'); });
-      });
-
-      document.getElementById('updatePassBtn').addEventListener('click', async function() {
-        var user = App.auth.getCurrentUser();
-        var current = document.getElementById('currentPass').value;
+      // Password
+      document.getElementById('passForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
         var newPass = document.getElementById('newPass').value;
         var confirm = document.getElementById('confirmPass').value;
+        if (newPass.length < 8) { App.toast('Min 8 characters', 'error'); return; }
+        if (newPass !== confirm) { App.toast('Passwords do not match', 'error'); return; }
 
         if (App.isSupabase()) {
           var result = await App.sb.auth.updateUser({ password: newPass });
           if (result.error) { App.toast(result.error.message, 'error'); return; }
-          App.toast(App.t('settings.saved'), 'success');
-        } else {
-          if (current !== user.password) { App.toast('Current password is wrong', 'error'); return; }
-          if (newPass.length < 8) { App.toast('Password too short', 'error'); return; }
-          if (newPass !== confirm) { App.toast('Passwords do not match', 'error'); return; }
-          await App.auth.updateProfile({ password: newPass });
-          App.toast(App.t('settings.saved'), 'success');
         }
-        document.getElementById('currentPass').value = '';
+        App.toast('Password updated!', 'success');
         document.getElementById('newPass').value = '';
         document.getElementById('confirmPass').value = '';
       });
 
-      document.getElementById('savePrefsBtn').addEventListener('click', function() {
-        settings.language = document.getElementById('langSelect').value;
-        App.db.saveSettings(settings);
-        App.toast(App.t('settings.saved'), 'success');
-      });
+      await loadProfile();
     })();
   </script>
 </body>

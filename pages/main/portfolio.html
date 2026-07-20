@@ -71,8 +71,14 @@
           <input class="input" type="text" id="pTags" placeholder="React, Tailwind, Node.js">
         </div>
         <div class="input-group">
-          <label data-i18n="portfolio.image_url">Image URL</label>
-          <input class="input" type="url" id="pImage" placeholder="https://...">
+          <label><i class="fas fa-image" style="margin-right:4px;font-size:0.85em"></i> Project Image</label>
+          <div style="border:2px dashed var(--border);border-radius:var(--radius-md);padding:var(--space-6);text-align:center;cursor:pointer;transition:all var(--transition)" id="imageDropZone" onclick="document.getElementById('pImageFile').click()">
+            <div id="imagePreviewArea"><i class="fas fa-cloud-arrow-up" style="font-size:2rem;color:var(--text-tertiary);margin-bottom:var(--space-2)"></i><p class="text-sm text-secondary">Click to upload image</p><p class="text-xs text-tertiary">JPG, PNG. Max 5MB</p></div>
+            <img id="imagePreviewImg" style="display:none;max-height:150px;border-radius:var(--radius-md);object-fit:cover;width:100%">
+          </div>
+          <input type="file" id="pImageFile" accept="image/*" style="display:none">
+          <p class="text-xs text-tertiary mt-1">Or paste URL:</p>
+          <input class="input" type="url" id="pImage" placeholder="https://..." style="font-size:var(--text-xs)">
         </div>
         <input type="hidden" id="pId">
         <div class="flex gap-3 justify-end">
@@ -105,6 +111,22 @@
 
       var user = App.auth.getCurrentUser();
       var currentView = 'all';
+      var selectedFile = null;
+
+      // Image file preview
+      document.getElementById('pImageFile').addEventListener('change', function(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        if (file.size > 5 * 1024 * 1024) { App.toast('Max 5MB!', 'error'); return; }
+        selectedFile = file;
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+          document.getElementById('imagePreviewImg').src = ev.target.result;
+          document.getElementById('imagePreviewImg').style.display = 'block';
+          document.getElementById('imagePreviewArea').style.display = 'none';
+        };
+        reader.readAsDataURL(file);
+      });
 
       async function renderProjects() {
         var projects = await App.db.getAllProjects();
@@ -174,6 +196,10 @@
         document.getElementById('pDesc').value = '';
         document.getElementById('pTags').value = '';
         document.getElementById('pImage').value = '';
+        document.getElementById('pImageFile').value = '';
+        document.getElementById('imagePreviewImg').style.display = 'none';
+        document.getElementById('imagePreviewArea').style.display = '';
+        selectedFile = null;
         App.modal.show('projectModal');
       });
 
@@ -186,6 +212,16 @@
         document.getElementById('pDesc').value = p.description || '';
         document.getElementById('pTags').value = (p.tags || []).join(', ');
         document.getElementById('pImage').value = p.image || '';
+        document.getElementById('pImageFile').value = '';
+        selectedFile = null;
+        if (p.image) {
+          document.getElementById('imagePreviewImg').src = p.image;
+          document.getElementById('imagePreviewImg').style.display = 'block';
+          document.getElementById('imagePreviewArea').style.display = 'none';
+        } else {
+          document.getElementById('imagePreviewImg').style.display = 'none';
+          document.getElementById('imagePreviewArea').style.display = '';
+        }
         App.modal.show('projectModal');
       };
 
@@ -201,12 +237,25 @@
         e.preventDefault();
         var id = document.getElementById('pId').value;
         var existing = id ? App.db.getProjects().find(function(x){return x.id===id;}) : null;
+        var imageUrl = document.getElementById('pImage').value.trim();
+
+        // Upload image if selected
+        if (selectedFile && App.isSupabase()) {
+          var path = user.id + '/' + Date.now() + '_' + selectedFile.name;
+          var upRes = await App.sb.storage.from('project-images').upload(path, selectedFile);
+          if (!upRes.error) {
+            imageUrl = App.sb.storage.from('project-images').getPublicUrl(path).data.publicUrl;
+          }
+        } else if (selectedFile) {
+          imageUrl = URL.createObjectURL(selectedFile);
+        }
+
         var project = {
           id: id || undefined,
           title: document.getElementById('pTitle').value.trim(),
           description: document.getElementById('pDesc').value.trim(),
           tags: document.getElementById('pTags').value.split(',').map(function(t) { return t.trim(); }).filter(Boolean),
-          image: document.getElementById('pImage').value.trim(),
+          image: imageUrl,
           userId: user.id,
           views: existing ? existing.views || 0 : 0,
           likes: existing ? existing.likes || 0 : 0,
@@ -215,6 +264,7 @@
         await App.db.saveProject(project);
         App.toast(id ? App.t('portfolio.updated') : App.t('portfolio.added'), 'success');
         App.modal.hide('projectModal');
+        selectedFile = null;
         await renderProjects();
       });
 

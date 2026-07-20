@@ -9,6 +9,7 @@ App.nav = {
     this._themeToggle();
     this._langSwitch();
     App.auth._updateNav();
+    this._updateNotifBadge();
   },
 
   _highlight: function() {
@@ -155,8 +156,7 @@ App.nav = {
     html += '<div class="topbar-search"><i class="fas fa-magnifying-glass" style="font-size:18px"></i>';
     html += '<input type="text" placeholder="' + App.t('nav.search_placeholder') + ' (Ctrl+K)"></div>';
     html += '<button class="btn-icon btn-ghost" data-theme-toggle title="' + App.t('nav.toggle_theme') + '"><i class="fas fa-moon"></i></button>';
-    html += '<a href="../settings/notifications.html" class="btn-icon btn-ghost" style="position:relative"><i class="fas fa-bell"></i>';
-    html += '</a>';
+    html += '<a href="../settings/notifications.html" class="topbar-notif-link" style="position:relative;display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:var(--radius-md);transition:all var(--transition);cursor:pointer;text-decoration:none;color:var(--text-secondary)"><i class="fas fa-bell" style="font-size:18px"></i><span id="topbarNotifDot" style="display:none;position:absolute;top:6px;right:6px;width:8px;height:8px;background:var(--danger);border-radius:50%;border:2px solid var(--surface)"></span></a>';
     html += '<div class="dropdown"><button class="btn-icon btn-ghost" data-dropdown><i class="fas fa-circle-user"></i></button>';
     html += '<div class="dropdown-menu">';
     html += '<a href="../main/profile.html" class="dropdown-item"><i class="fas fa-user"></i>' + App.t('nav.profile') + '</a>';
@@ -169,5 +169,14 @@ App.nav = {
     if (topbar) topbar.innerHTML = html;
     this._dropdowns();
     this._themeToggle();
+  },
+
+  _updateNotifBadge: async function() {
+    try {
+      var notifs = await App.db.getNotifications();
+      var unread = notifs.filter(function(n) { return !n.read; }).length;
+      var dot = document.getElementById('topbarNotifDot');
+      if (dot) dot.style.display = unread > 0 ? 'block' : 'none';
+    } catch(e) {}
   }
 };

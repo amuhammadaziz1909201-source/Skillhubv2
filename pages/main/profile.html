@@ -84,16 +84,34 @@
       await App.pages.initLayout({ activePage: 'profile', title: App.t('nav.profile') });
 
       var user = App.auth.getCurrentUser();
-      document.getElementById('userName').textContent = user.fullName;
-      document.getElementById('userHandle').textContent = '@' + App.utils.slugify(user.fullName);
-      document.getElementById('userBio').textContent = user.bio || 'No bio yet.';
-      document.getElementById('userRole').textContent = user.role === 'admin' ? 'Admin' : 'Developer';
+
+      // Load fresh profile from Supabase
+      var profile = user;
+      if (App.isSupabase()) {
+        var res = await App.sb.from('profiles').select('*').eq('id', user.id).single();
+        if (res.data) {
+          profile = {
+            id: res.data.id, fullName: res.data.full_name, firstName: res.data.first_name,
+            lastName: res.data.last_name, avatar: res.data.avatar, bio: res.data.bio,
+            role: res.data.role, skills: res.data.skills || [], jobRole: res.data.job_role || '',
+            location: res.data.location || '', links: res.data.links || {}
+          };
+        }
+      }
+
+      document.getElementById('userName').textContent = profile.fullName;
+      document.getElementById('userHandle').textContent = '@' + App.utils.slugify(profile.fullName);
+      document.getElementById('userBio').textContent = profile.bio || 'No bio yet.';
+      document.getElementById('userRole').textContent = profile.jobRole || (profile.role === 'admin' ? 'Admin' : 'Developer');
+
+      var locationEl = document.getElementById('userLocation');
+      if (locationEl) locationEl.textContent = profile.location || 'Not specified';
 
       var avatarEl = document.getElementById('avatarEl');
-      if (user.avatar) {
-        avatarEl.innerHTML = '<img src="' + user.avatar + '" alt="">';
+      if (profile.avatar) {
+        avatarEl.innerHTML = '<img src="' + profile.avatar + '" alt="">';
       } else {
-        avatarEl.textContent = App.utils.getInitials(user.fullName);
+        avatarEl.textContent = App.utils.getInitials(profile.fullName);
       }
 
       var skillsEl = document.getElementById('skillsList');

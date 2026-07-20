@@ -11,6 +11,8 @@ create table if not exists profiles (
   bio text default '',
   role text default 'user' check (role in ('user','admin')),
   skills text[] default '{}',
+  job_role text default '',
+  location text default '',
   links jsonb default '{}',
   created_at timestamptz default now(),
   updated_at timestamptz default now()
@@ -164,3 +166,20 @@ drop trigger if exists profiles_updated_at on profiles;
 create trigger profiles_updated_at before update on profiles for each row execute function update_updated_at();
 drop trigger if exists projects_updated_at on projects;
 create trigger projects_updated_at before update on projects for each row execute function update_updated_at();
+
+-- Storage buckets (Supabase Dashboard > Storage > New Bucket)
+-- Create "avatars" bucket (public)
+-- Create "project-images" bucket (public)
+-- Run these in SQL Editor if buckets don't exist:
+insert into storage.buckets (id, name, public) values ('avatars', 'avatars', true) on conflict (id) do nothing;
+insert into storage.buckets (id, name, public) values ('project-images', 'project-images', true) on conflict (id) do nothing;
+
+-- Storage policies
+create policy "Avatar uploads" on storage.objects for all using (bucket_id = 'avatars');
+create policy "Project image uploads" on storage.objects for all using (bucket_id = 'project-images');
+create policy "Avatar public read" on storage.objects for select using (bucket_id = 'avatars');
+create policy "Project images public read" on storage.objects for select using (bucket_id = 'project-images');
+
+-- Migration: add job_role and location to profiles
+alter table profiles add column if not exists job_role text default '';
+alter table profiles add column if not exists location text default '';

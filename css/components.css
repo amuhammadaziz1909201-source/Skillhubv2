@@ -11,21 +11,9 @@
   white-space: nowrap;
   user-select: none;
   position: relative;
-  overflow: hidden;
 }
-.btn::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at var(--ripple-x, 50%) var(--ripple-y, 50%), rgba(255,255,255,0.3) 0%, transparent 60%);
-  opacity: 0;
-  transition: opacity 0.4s;
-  pointer-events: none;
-}
-.btn:active::after { opacity: 1; transition: opacity 0s; }
 .btn:active { transform: scale(0.96); }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-.btn:disabled::after { display: none; }
 
 .btn-primary {
   background: var(--primary);
