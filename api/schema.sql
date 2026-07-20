@@ -175,18 +175,30 @@ insert into storage.buckets (id, name, public) values ('avatars', 'avatars', tru
 insert into storage.buckets (id, name, public) values ('project-images', 'project-images', true) on conflict (id) do nothing;
 insert into storage.buckets (id, name, public) values ('site-backups', 'site-backups', true) on conflict (id) do nothing;
 
--- Storage policies
+-- Storage policies — drop old ones first
 drop policy if exists "Avatar uploads" on storage.objects;
-create policy "Avatar uploads" on storage.objects for all using (bucket_id = 'avatars');
-drop policy if exists "Project image uploads" on storage.objects;
-create policy "Project image uploads" on storage.objects for all using (bucket_id = 'project-images');
-drop policy if exists "Site backups write" on storage.objects;
-create policy "Site backups write" on storage.objects for all using (bucket_id = 'site-backups');
 drop policy if exists "Avatar public read" on storage.objects;
-create policy "Avatar public read" on storage.objects for select using (bucket_id = 'avatars');
+drop policy if exists "Project image uploads" on storage.objects;
 drop policy if exists "Project images public read" on storage.objects;
-create policy "Project images public read" on storage.objects for select using (bucket_id = 'project-images');
+drop policy if exists "Site backups write" on storage.objects;
 drop policy if exists "Site backups read" on storage.objects;
+
+-- Avatars
+create policy "Avatar uploads" on storage.objects for insert with check (bucket_id = 'avatars');
+create policy "Avatar update" on storage.objects for update using (bucket_id = 'avatars');
+create policy "Avatar delete" on storage.objects for delete using (bucket_id = 'avatars');
+create policy "Avatar public read" on storage.objects for select using (bucket_id = 'avatars');
+
+-- Project images
+create policy "Project image uploads" on storage.objects for insert with check (bucket_id = 'project-images');
+create policy "Project image update" on storage.objects for update using (bucket_id = 'project-images');
+create policy "Project image delete" on storage.objects for delete using (bucket_id = 'project-images');
+create policy "Project images public read" on storage.objects for select using (bucket_id = 'project-images');
+
+-- Site backups
+create policy "Site backups insert" on storage.objects for insert with check (bucket_id = 'site-backups');
+create policy "Site backups update" on storage.objects for update using (bucket_id = 'site-backups');
+create policy "Site backups delete" on storage.objects for delete using (bucket_id = 'site-backups');
 create policy "Site backups read" on storage.objects for select using (bucket_id = 'site-backups');
 
 -- Migration: add job_role and location to profiles
