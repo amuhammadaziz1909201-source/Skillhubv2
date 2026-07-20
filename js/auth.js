@@ -74,11 +74,11 @@ App.auth = {
 
   register: async function(data) {
     if (!data.fullName || !data.email || !data.password) {
-      return { error: App.t('auth.fill_all') };
+      return { error: App.t('auth.error.fill_all') };
     }
-    if (data.password.length < 8) return { error: App.t('auth.password_short') };
-    if (!/[a-zA-Z]/.test(data.password)) return { error: App.t('auth.password_letter') };
-    if (!/[^a-zA-Z0-9]/.test(data.password)) return { error: App.t('auth.password_symbol') };
+    if (data.password.length < 8) return { error: App.t('auth.error.password_short') };
+    if (!/[a-zA-Z]/.test(data.password)) return { error: App.t('auth.error.password_letter') };
+    if (!/[^a-zA-Z0-9]/.test(data.password)) return { error: App.t('auth.error.password_symbol') };
 
     if (App.isSupabase()) {
       var parts = data.fullName.trim().split(' ');
@@ -103,7 +103,7 @@ App.auth = {
     }
 
     var existing = App.db.findUser(data.email);
-    if (existing) return { error: App.t('auth.email_exists') };
+    if (existing) return { error: App.t('auth.error.email_exists') };
 
     var nameParts = data.fullName.trim().split(' ');
     var user = {
@@ -121,22 +121,22 @@ App.auth = {
   },
 
   login: async function(email, password) {
-    if (!email || !password) return { error: App.t('auth.email_required') };
+    if (!email || !password) return { error: App.t('auth.error.email_required') };
 
     if (App.isSupabase()) {
       var result = await App.sb.auth.signInWithPassword({ email: email, password: password });
       if (result.error) {
         var msg = result.error.message;
-        if (msg.includes('Invalid login')) return { error: App.t('auth.wrong_password') };
-        if (msg.includes('Email not confirmed')) return { error: App.t('auth.email_not_confirmed') };
+        if (msg.includes('Invalid login')) return { error: App.t('auth.error.wrong_password') };
+        if (msg.includes('Email not confirmed')) return { error: App.t('auth.error.email_not_confirmed') };
         return { error: msg };
       }
       return { user: result.data.user };
     }
 
     var user = App.db.findUser(email);
-    if (!user) return { error: App.t('auth.user_not_found') };
-    if (user.password !== password) return { error: App.t('auth.wrong_password') };
+    if (!user) return { error: App.t('auth.error.user_not_found') };
+    if (user.password !== password) return { error: App.t('auth.error.wrong_password') };
     this.setCurrentUser(user);
     App.toast(App.t('auth.login_success'), 'success');
     return { user: user };
