@@ -6,7 +6,7 @@
   <title>SkillHub — Admin Panel</title>
   <link rel="icon" href="../../assets/icons/icon-192.png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="../../css/variables.css">
   <link rel="stylesheet" href="../../css/reset.css">
   <link rel="stylesheet" href="../../css/components.css">
@@ -29,21 +29,21 @@
           <div class="card">
             <div class="flex justify-between items-center mb-2">
               <span class="text-sm text-secondary" data-i18n="admin.total_users">Total Users</span>
-              <span class="material-icons text-primary" style="font-size:20px">people</span>
+              <i class="fas fa-users text-primary" style="font-size:20px"></i>
             </div>
             <h3 id="totalUsers">0</h3>
           </div>
           <div class="card">
             <div class="flex justify-between items-center mb-2">
               <span class="text-sm text-secondary" data-i18n="admin.total_projects">Total Projects</span>
-              <span class="material-icons text-primary" style="font-size:20px">folder</span>
+              <i class="fas fa-folder text-primary" style="font-size:20px"></i>
             </div>
             <h3 id="totalProjects">0</h3>
           </div>
           <div class="card">
             <div class="flex justify-between items-center mb-2">
               <span class="text-sm text-secondary" data-i18n="admin.total_views">Total Views</span>
-              <span class="material-icons text-primary" style="font-size:20px">visibility</span>
+              <i class="fas fa-eye text-primary" style="font-size:20px"></i>
             </div>
             <h3 id="totalViews">0</h3>
           </div>
@@ -129,7 +129,7 @@
             '<td class="text-secondary">' + App.utils.sanitize(u.email) + '</td>' +
             '<td><span class="badge ' + (u.role === 'admin' ? 'badge-danger' : 'badge-primary') + '">' + (u.role === 'admin' ? App.t('admin.admin') : App.t('admin.user')) + '</span></td>' +
             '<td class="text-secondary text-sm">' + App.utils.formatDate(u.createdAt) + '</td>' +
-            '<td><button class="btn btn-ghost btn-sm" style="color:var(--danger)" data-delete-user="' + u.id + '"><span class="material-icons" style="font-size:16px">delete</span></button></td>';
+            '<td><button class="btn btn-ghost btn-sm" style="color:var(--danger)" data-delete-user="' + u.id + '"><i class="fas fa-trash" style="font-size:16px"></i></button></td>';
           tbody.appendChild(tr);
         });
 
@@ -157,7 +157,7 @@
             '<td class="text-secondary">' + (owner ? App.utils.sanitize(owner.fullName) : 'Unknown') + '</td>' +
             '<td>' + (p.views || 0) + '</td>' +
             '<td>' + (p.likes || 0) + '</td>' +
-            '<td><button class="btn btn-ghost btn-sm" style="color:var(--danger)" data-delete-proj="' + p.id + '"><span class="material-icons" style="font-size:16px">delete</span></button></td>';
+            '<td><button class="btn btn-ghost btn-sm" style="color:var(--danger)" data-delete-proj="' + p.id + '"><i class="fas fa-trash" style="font-size:16px"></i></button></td>';
           tbody.appendChild(tr);
         });
 

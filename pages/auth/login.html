@@ -6,7 +6,7 @@
   <title>SkillHub — Sign In</title>
   <link rel="icon" href="../../assets/icons/icon-192.png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="../../css/variables.css">
   <link rel="stylesheet" href="../../css/reset.css">
   <link rel="stylesheet" href="../../css/components.css">
@@ -35,9 +35,9 @@
               <a href="forgot-password.html" class="text-sm text-primary" data-i18n="auth.forgot_password">Forgot password?</a>
             </div>
             <div class="input-with-icon">
-              <span class="material-icons icon">lock</span>
+              <span class="fas fa-lock icon"></span>
               <input class="input" type="password" id="password" placeholder="********" required>
-              <span class="material-icons icon-action" id="togglePass" style="cursor:pointer">visibility_off</span>
+              <span class="fas fa-eye-slash icon-action" id="togglePass" style="cursor:pointer"></span>
             </div>
           </div>
           <div id="errorMsg" class="text-danger text-sm" style="display:none"></div>
@@ -117,8 +117,8 @@
 
       document.getElementById('togglePass').addEventListener('click', function() {
         var input = document.getElementById('password');
-        if (input.type === 'password') { input.type = 'text'; this.textContent = 'visibility'; }
-        else { input.type = 'password'; this.textContent = 'visibility_off'; }
+        if (input.type === 'password') { input.type = 'text'; this.className = 'fas fa-eye icon-action'; }
+        else { input.type = 'password'; this.className = 'fas fa-eye-slash icon-action'; }
       });
     })();
   </script>

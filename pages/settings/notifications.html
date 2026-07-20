@@ -6,7 +6,7 @@
   <title>SkillHub — Notifications</title>
   <link rel="icon" href="../../assets/icons/icon-192.png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="../../css/variables.css">
   <link rel="stylesheet" href="../../css/reset.css">
   <link rel="stylesheet" href="../../css/components.css">
@@ -77,9 +77,9 @@
           var item = document.createElement('div');
           item.className = 'card mb-2 flex gap-4 items-center';
           item.style.opacity = n.read ? '0.6' : '1';
-          var iconMap = { info: 'info', warning: 'warning', error: 'error', success: 'check_circle' };
+          var iconMap = { info: 'fa-circle-info', warning: 'fa-triangle-exclamation', error: 'fa-circle-exclamation', success: 'fa-circle-check' };
           item.innerHTML =
-            '<span class="material-icons" style="color:var(--' + (n.type === 'warning' ? 'warning' : n.type === 'error' ? 'danger' : n.type === 'success' ? 'success' : 'primary') + ')">' + (iconMap[n.type] || 'info') + '</span>' +
+            '<i class="fas ' + (iconMap[n.type] || 'fa-circle-info') + '" style="color:var(--' + (n.type === 'warning' ? 'warning' : n.type === 'error' ? 'danger' : n.type === 'success' ? 'success' : 'primary') + ')"></i>' +
             '<div style="flex:1"><p class="text-sm">' + App.utils.sanitize(n.message) + '</p><p class="text-xs text-tertiary mt-1">' + App.utils.timeAgo(n.createdAt) + '</p></div>' +
             (!n.read ? '<div style="width:8px;height:8px;background:var(--primary);border-radius:50%;flex-shrink:0"></div>' : '');
           item.addEventListener('click', async function() {

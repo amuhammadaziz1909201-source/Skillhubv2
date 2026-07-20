@@ -3,6 +3,7 @@
   --primary-hover: #2a1da8;
   --primary-light: #e2e7ff;
   --primary-dark: #1a1280;
+  --primary-glow: rgba(53,37,205,0.15);
 
   --success: #16a34a;
   --success-light: #dcfce7;
@@ -33,6 +34,8 @@
   --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -2px rgba(0,0,0,0.04);
   --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.08), 0 4px 6px -4px rgba(0,0,0,0.04);
   --shadow-xl: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.06);
+  --shadow-glow: 0 0 20px var(--primary-glow);
+  --shadow-card-hover: 0 8px 25px -5px rgba(0,0,0,0.1), 0 4px 10px -5px rgba(0,0,0,0.04);
 
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -63,8 +66,10 @@
   --space-12: 3rem;
   --space-16: 4rem;
 
-  --transition: 0.2s ease;
-  --transition-slow: 0.3s ease;
+  --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
 
   --sidebar-width: 260px;
   --header-height: 64px;
@@ -89,4 +94,6 @@
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.4);
   --shadow-md: 0 4px 6px rgba(0,0,0,0.4);
   --shadow-lg: 0 10px 15px rgba(0,0,0,0.4);
+  --shadow-card-hover: 0 8px 25px rgba(0,0,0,0.5);
+  --shadow-glow: 0 0 20px rgba(53,37,205,0.25);
 }

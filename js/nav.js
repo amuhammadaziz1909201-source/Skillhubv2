@@ -93,18 +93,18 @@ App.nav = {
     notifCount = notifCount || 0;
 
     var mainLinks = [
-      { href: '../main/dashboard.html', icon: 'dashboard', label: App.t('nav.dashboard'), key: 'dashboard' },
-      { href: '../main/portfolio.html', icon: 'folder', label: App.t('nav.portfolio'), key: 'portfolio' },
-      { href: '../main/community.html', icon: 'people', label: App.t('nav.community'), key: 'community' },
-      { href: '../main/search.html', icon: 'search', label: App.t('nav.search'), key: 'search' },
+      { href: '../main/dashboard.html', icon: '<i class="fas fa-gauge-high"></i>', label: App.t('nav.dashboard'), key: 'dashboard' },
+      { href: '../main/portfolio.html', icon: '<i class="fas fa-folder"></i>', label: App.t('nav.portfolio'), key: 'portfolio' },
+      { href: '../main/community.html', icon: '<i class="fas fa-users"></i>', label: App.t('nav.community'), key: 'community' },
+      { href: '../main/search.html', icon: '<i class="fas fa-magnifying-glass"></i>', label: App.t('nav.search'), key: 'search' },
     ];
     var accountLinks = [
-      { href: '../main/profile.html', icon: 'person', label: App.t('nav.profile'), key: 'profile' },
-      { href: '../settings/settings.html', icon: 'settings', label: App.t('nav.settings'), key: 'settings' },
-      { href: '../settings/notifications.html', icon: 'notifications', label: App.t('nav.notifications'), key: 'notifications', badge: notifCount || '' },
+      { href: '../main/profile.html', icon: '<i class="fas fa-user"></i>', label: App.t('nav.profile'), key: 'profile' },
+      { href: '../settings/settings.html', icon: '<i class="fas fa-gear"></i>', label: App.t('nav.settings'), key: 'settings' },
+      { href: '../settings/notifications.html', icon: '<i class="fas fa-bell"></i>', label: App.t('nav.notifications'), key: 'notifications', badge: notifCount || '' },
     ];
     var adminLinks = [
-      { href: '../admin/admin.html', icon: 'admin_panel', label: App.t('nav.admin'), key: 'admin' },
+      { href: '../admin/admin.html', icon: '<i class="fas fa-shield-halved"></i>', label: App.t('nav.admin'), key: 'admin' },
     ];
 
     var html = '<div class="sidebar-header"><h2><span style="color:var(--primary)">SkillHub</span> <span class="badge badge-primary">BETA</span></h2><p>' + App.t('nav.manage') + '</p></div>';
@@ -112,20 +112,20 @@ App.nav = {
     html += '<div class="sidebar-section"><div class="sidebar-section-title">' + App.t('nav.main') + '</div>';
     mainLinks.forEach(function(l) {
       html += '<a href="' + l.href + '" class="sidebar-link' + (activePage === l.key ? ' active' : '') + '">';
-      html += '<span class="icon"><i class="material-icons">' + l.icon + '</i></span><span>' + l.label + '</span>';
+      html += '<span class="icon">' + l.icon + '</span><span>' + l.label + '</span>';
       html += '</a>';
     });
     html += '</div><div class="sidebar-section"><div class="sidebar-section-title">' + App.t('nav.account') + '</div>';
     accountLinks.forEach(function(l) {
       html += '<a href="' + l.href + '" class="sidebar-link' + (activePage === l.key ? ' active' : '') + '">';
-      html += '<span class="icon"><i class="material-icons">' + l.icon + '</i></span><span>' + l.label + '</span>';
+      html += '<span class="icon">' + l.icon + '</span><span>' + l.label + '</span>';
       if (l.badge) html += '<span class="badge">' + l.badge + '</span>';
       html += '</a>';
     });
     if (isAdmin) {
       adminLinks.forEach(function(l) {
         html += '<a href="' + l.href + '" class="sidebar-link' + (activePage === l.key ? ' active' : '') + '">';
-        html += '<span class="icon"><i class="material-icons">' + l.icon + '</i></span><span>' + l.label + '</span></a>';
+        html += '<span class="icon">' + l.icon + '</span><span>' + l.label + '</span></a>';
       });
     }
     html += '</div></nav>';
@@ -138,7 +138,7 @@ App.nav = {
     }
     html += '<div class="info"><div class="name">' + (user ? App.utils.sanitize(user.fullName) : 'Guest') + '</div>';
     html += '<div class="email">' + (user ? App.utils.sanitize(user.email) : '') + '</div></div>';
-    html += '<button class="btn btn-ghost btn-sm" style="color:var(--danger);margin-left:auto" onclick="App.auth.logout()" title="Logout"><i class="material-icons" style="font-size:18px">logout</i></button>';
+    html += '<button class="btn btn-ghost btn-sm" style="color:var(--danger);margin-left:auto" onclick="App.auth.logout()" title="Logout"><i class="fas fa-right-from-bracket" style="font-size:18px"></i></button>';
     html += '</div></div>';
 
     var sidebar = document.querySelector('.sidebar');
@@ -149,20 +149,20 @@ App.nav = {
     var user = App.auth.getCurrentUser();
 
     var html = '<div class="topbar-left">';
-    html += '<button class="mobile-menu-btn btn-icon"><i class="material-icons">menu</i></button>';
+    html += '<button class="mobile-menu-btn btn-icon"><i class="fas fa-bars"></i></button>';
     html += '<h4>' + (title || '') + '</h4></div>';
     html += '<div class="topbar-right">';
-    html += '<div class="topbar-search"><i class="material-icons" style="font-size:18px">search</i>';
+    html += '<div class="topbar-search"><i class="fas fa-magnifying-glass" style="font-size:18px"></i>';
     html += '<input type="text" placeholder="' + App.t('nav.search_placeholder') + ' (Ctrl+K)"></div>';
-    html += '<button class="btn-icon btn-ghost" data-theme-toggle title="' + App.t('nav.toggle_theme') + '"><i class="material-icons">dark_mode</i></button>';
-    html += '<a href="../settings/notifications.html" class="btn-icon btn-ghost" style="position:relative"><i class="material-icons">notifications</i>';
+    html += '<button class="btn-icon btn-ghost" data-theme-toggle title="' + App.t('nav.toggle_theme') + '"><i class="fas fa-moon"></i></button>';
+    html += '<a href="../settings/notifications.html" class="btn-icon btn-ghost" style="position:relative"><i class="fas fa-bell"></i>';
     html += '</a>';
-    html += '<div class="dropdown"><button class="btn-icon btn-ghost" data-dropdown><i class="material-icons">account_circle</i></button>';
+    html += '<div class="dropdown"><button class="btn-icon btn-ghost" data-dropdown><i class="fas fa-circle-user"></i></button>';
     html += '<div class="dropdown-menu">';
-    html += '<a href="../main/profile.html" class="dropdown-item"><i class="material-icons">person</i>' + App.t('nav.profile') + '</a>';
-    html += '<a href="../settings/settings.html" class="dropdown-item"><i class="material-icons">settings</i>' + App.t('nav.settings') + '</a>';
+    html += '<a href="../main/profile.html" class="dropdown-item"><i class="fas fa-user"></i>' + App.t('nav.profile') + '</a>';
+    html += '<a href="../settings/settings.html" class="dropdown-item"><i class="fas fa-gear"></i>' + App.t('nav.settings') + '</a>';
     html += '<div class="dropdown-divider"></div>';
-    html += '<button class="dropdown-item" onclick="App.auth.logout()" style="color:var(--danger)"><i class="material-icons">logout</i>' + App.t('nav.logout') + '</button>';
+    html += '<button class="dropdown-item" onclick="App.auth.logout()" style="color:var(--danger)"><i class="fas fa-right-from-bracket"></i>' + App.t('nav.logout') + '</button>';
     html += '</div></div></div>';
 
     var topbar = document.querySelector('.topbar');

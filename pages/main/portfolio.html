@@ -6,7 +6,7 @@
   <title>SkillHub — Portfolio</title>
   <link rel="icon" href="../../assets/icons/icon-192.png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="../../css/variables.css">
   <link rel="stylesheet" href="../../css/reset.css">
   <link rel="stylesheet" href="../../css/components.css">
@@ -26,7 +26,7 @@
             <h2 data-i18n="portfolio.explore">Explore Projects</h2>
             <p class="text-sm text-secondary mt-1" data-i18n="portfolio.explore_desc">Discover the best work from top developers.</p>
           </div>
-          <button class="btn btn-primary" id="addProjectBtn"><span class="material-icons" style="font-size:18px">add</span> <span data-i18n="portfolio.add_project">Add Project</span></button>
+          <button class="btn btn-primary" id="addProjectBtn"><i class="fas fa-plus" style="font-size:18px"></i> <span data-i18n="portfolio.add_project">Add Project</span></button>
         </div>
 
         <div class="tabs mb-6">
@@ -142,7 +142,7 @@
             card.className = 'card';
             card.innerHTML =
               '<div style="height:160px;background:var(--bg-secondary);border-radius:var(--radius-md);margin-bottom:var(--space-4);display:flex;align-items:center;justify-content:center;overflow:hidden">' +
-              (p.image ? '<img src="' + p.image + '" style="width:100%;height:100%;object-fit:cover">' : '<span class="material-icons text-tertiary" style="font-size:48px">folder</span>') +
+              (p.image ? '<img src="' + p.image + '" style="width:100%;height:100%;object-fit:cover">' : '<i class="fas fa-folder text-tertiary" style="font-size:48px"></i>') +
               '</div>' +
               '<h4 class="mb-2">' + App.utils.sanitize(p.title) + '</h4>' +
               '<p class="text-sm text-secondary line-clamp-2 mb-4">' + App.utils.sanitize(p.description || '') + '</p>' +
@@ -150,8 +150,8 @@
               (p.tags || []).map(function(t) { return '<span class="badge badge-primary">' + App.utils.sanitize(t) + '</span>'; }).join('') +
               '</div>' +
               '<div class="flex justify-between items-center">' +
-              '<div class="flex gap-3 text-xs text-tertiary"><span><span class="material-icons" style="font-size:14px;vertical-align:middle">visibility</span> ' + (p.views||0) + '</span><span><span class="material-icons" style="font-size:14px;vertical-align:middle">favorite</span> ' + (p.likes||0) + '</span></div>' +
-              (isOwner ? '<div class="flex gap-2"><button class="btn btn-ghost btn-sm" onclick="editProject(\'' + p.id + '\')"><span class="material-icons" style="font-size:16px">edit</span></button><button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="deleteProject(\'' + p.id + '\')"><span class="material-icons" style="font-size:16px">delete</span></button></div>' : '') +
+              '<div class="flex gap-3 text-xs text-tertiary"><span><i class="fas fa-eye" style="font-size:14px"></i> ' + (p.views||0) + '</span><span><i class="fas fa-heart" style="font-size:14px"></i> ' + (p.likes||0) + '</span></div>' +
+              (isOwner ? '<div class="flex gap-2"><button class="btn btn-ghost btn-sm" onclick="editProject(\'' + p.id + '\')"><i class="fas fa-pen" style="font-size:16px"></i></button><button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="deleteProject(\'' + p.id + '\')"><i class="fas fa-trash" style="font-size:16px"></i></button></div>' : '') +
               '</div>';
             grid.appendChild(card);
           });
