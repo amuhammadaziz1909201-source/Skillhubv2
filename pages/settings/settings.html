@@ -93,6 +93,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../../js/utils.js"></script>
   <script src="../../js/i18n.js"></script>
   <script src="../../js/supabase.js"></script>
@@ -108,6 +109,8 @@
         App.i18n.load(langs[i], await res.json());
       }
       if (!App.auth.requireAuth()) return;
+      App.initSupabase();
+      App.auth.init();
       App.pages.initLayout({ activePage: 'settings', title: App.t('settings.title') });
 
       var settings = App.db.getSettings();

@@ -105,7 +105,8 @@
       "password_short": "Password must be at least 8 characters",
       "password_letter": "Password must contain a letter",
       "password_symbol": "Password must contain a symbol",
-      "email_exists": "This email is already registered"
+      "email_exists": "This email is already registered",
+      "email_not_confirmed": "Email not verified. Check your inbox."
     },
     "login_success": "Logged in successfully!",
     "register_success": "Account created!",

@@ -26,7 +26,7 @@
           <p data-i18n="dashboard.subtitle">Here's what's happening with your projects.</p>
         </div>
 
-        <div class="grid grid-4 gap-4 mb-8" id="statsGrid">
+        <div class="grid grid-4 gap-4 mb-8">
           <div class="card">
             <div class="flex justify-between items-center mb-2">
               <span class="text-sm text-secondary" data-i18n="dashboard.total_views">Total Views</span>
@@ -78,6 +78,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../../js/utils.js"></script>
   <script src="../../js/i18n.js"></script>
   <script src="../../js/supabase.js"></script>
@@ -92,25 +93,30 @@
         var res = await fetch('../../i18n/' + langs[i] + '.json');
         App.i18n.load(langs[i], await res.json());
       }
+      App.initSupabase();
+      App.auth.init();
       App.pages.seedDemoData();
       if (!App.auth.requireAuth()) return;
 
       App.pages.initLayout({ activePage: 'dashboard', title: App.t('nav.dashboard') });
 
       var user = App.auth.getCurrentUser();
-      var firstName = user ? user.firstName : '';
+      var firstName = user ? user.firstName || user.fullName.split(' ')[0] : '';
       document.getElementById('welcomeMsg').textContent = App.t('dashboard.welcome') + ', ' + firstName;
 
-      var projects = App.db.getProjects();
-      var myProjects = projects.filter(function(p) { return p.userId === user.id; }).slice(0, 6);
+      var allProjects = App.db.getAllProjects();
+      var myProjects = allProjects.filter(function(p) { return p.userId === (user ? user.id : ''); }).slice(0, 6);
       document.getElementById('statProjects').textContent = myProjects.length;
 
       var grid = document.getElementById('projectsGrid');
-      if (myProjects.length === 0) {
+      var displayProjects = myProjects.length > 0 ? myProjects : allProjects.slice(0, 6);
+
+      if (displayProjects.length === 0) {
         document.getElementById('emptyState').style.display = '';
         grid.style.display = 'none';
       } else {
-        myProjects.forEach(function(p) {
+        displayProjects.forEach(function(p) {
+          var owner = App.db.findUserById ? App.db.findUserById(p.userId) : null;
           var card = document.createElement('div');
           card.className = 'card';
           card.innerHTML = '<div style="height:140px;background:var(--bg-secondary);border-radius:var(--radius-md);margin-bottom:var(--space-4);display:flex;align-items:center;justify-content:center;overflow:hidden">' +
@@ -133,10 +139,7 @@
         if (target > 0) {
           var observer = new IntersectionObserver(function(entries) {
             entries.forEach(function(entry) {
-              if (entry.isIntersecting) {
-                App.utils.animateCounter(el, target, 1500);
-                observer.unobserve(el);
-              }
+              if (entry.isIntersecting) { App.utils.animateCounter(el, target, 1500); observer.unobserve(el); }
             });
           }, { threshold: 0.5 });
           observer.observe(el);

@@ -27,24 +27,28 @@
         <form class="auth-form" id="registerForm">
           <div class="input-group">
             <label data-i18n="auth.full_name">Full Name</label>
-            <input class="input" type="text" id="fullName" placeholder="Alex Rivera" data-i18n-placeholder="auth.full_name_placeholder" required>
+            <input class="input" type="text" id="fullName" placeholder="Alex Rivera" required>
           </div>
           <div class="input-group">
             <label data-i18n="auth.email">Email address</label>
-            <input class="input" type="email" id="email" placeholder="example@gmail.com" data-i18n-placeholder="auth.email_placeholder" required>
+            <input class="input" type="email" id="email" placeholder="example@gmail.com" required>
           </div>
           <div class="input-group">
             <label data-i18n="auth.password">Password</label>
             <input class="input" type="password" id="password" placeholder="********" required>
             <div class="password-rules">
               <p class="text-xs font-semibold" data-i18n="auth.password_rules">Password must contain:</p>
-              <div class="password-rule" id="ruleLength"><span class="icon">❌</span> <span data-i18n="auth.rule_length">At least 8 characters</span></div>
-              <div class="password-rule" id="ruleLetter"><span class="icon">❌</span> <span data-i18n="auth.rule_letter">At least one letter</span></div>
-              <div class="password-rule" id="ruleSymbol"><span class="icon">❌</span> <span data-i18n="auth.rule_symbol">At least one symbol</span></div>
+              <div class="password-rule" id="ruleLength"><span class="icon">&#10060;</span> <span data-i18n="auth.rule_length">At least 8 characters</span></div>
+              <div class="password-rule" id="ruleLetter"><span class="icon">&#10060;</span> <span data-i18n="auth.rule_letter">At least one letter</span></div>
+              <div class="password-rule" id="ruleSymbol"><span class="icon">&#10060;</span> <span data-i18n="auth.rule_symbol">At least one symbol</span></div>
             </div>
           </div>
           <div id="errorMsg" class="text-danger text-sm" style="display:none"></div>
-          <button type="submit" class="btn btn-primary btn-full btn-lg" data-i18n="auth.create_account">Create Account</button>
+          <div id="successMsg" class="text-success text-sm" style="display:none"></div>
+          <button type="submit" class="btn btn-primary btn-full btn-lg" id="registerBtn">
+            <span id="registerText" data-i18n="auth.create_account">Create Account</span>
+            <span id="registerSpinner" class="spinner" style="display:none"></span>
+          </button>
         </form>
 
         <p class="auth-footer">
@@ -61,6 +65,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../../js/utils.js"></script>
   <script src="../../js/i18n.js"></script>
   <script src="../../js/supabase.js"></script>
@@ -74,6 +79,8 @@
         var res = await fetch('../../i18n/' + langs[i] + '.json');
         App.i18n.load(langs[i], await res.json());
       }
+      App.initSupabase();
+      App.auth.init();
       App.pages.seedDemoData();
       App.pages.initAuthPage();
 
@@ -83,8 +90,18 @@
       }
 
       var form = document.getElementById('registerForm');
-      var passwordInput = document.getElementById('password');
       var errorMsg = document.getElementById('errorMsg');
+      var successMsg = document.getElementById('successMsg');
+      var passwordInput = document.getElementById('password');
+      var registerBtn = document.getElementById('registerBtn');
+      var registerText = document.getElementById('registerText');
+      var registerSpinner = document.getElementById('registerSpinner');
+
+      function setLoading(loading) {
+        registerBtn.disabled = loading;
+        registerText.style.display = loading ? 'none' : '';
+        registerSpinner.style.display = loading ? '' : 'none';
+      }
 
       passwordInput.addEventListener('input', function() {
         var v = this.value;
@@ -96,19 +113,29 @@
       function toggleRule(id, valid) {
         var el = document.getElementById(id);
         el.classList.toggle('valid', valid);
-        el.querySelector('.icon').textContent = valid ? '✅' : '❌';
+        el.querySelector('.icon').textContent = valid ? '\u2705' : '\u274C';
       }
 
-      form.addEventListener('submit', function(e) {
+      form.addEventListener('submit', async function(e) {
         e.preventDefault();
-        var result = App.auth.register({
+        errorMsg.style.display = 'none';
+        successMsg.style.display = 'none';
+        setLoading(true);
+
+        var result = await App.auth.register({
           fullName: document.getElementById('fullName').value,
           email: document.getElementById('email').value.trim(),
           password: passwordInput.value
         });
+
+        setLoading(false);
         if (result.error) {
           errorMsg.textContent = result.error;
           errorMsg.style.display = 'block';
+        } else if (result.needsVerification) {
+          successMsg.textContent = App.t('auth.reset_sent') + ' Check your email.';
+          successMsg.style.display = 'block';
+          form.style.display = 'none';
         } else {
           window.location.href = 'login.html';
         }

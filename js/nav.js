@@ -27,7 +27,6 @@ App.nav = {
     var sidebar = document.querySelector('.sidebar');
     var overlay = document.querySelector('.sidebar-overlay');
     if (!btn || !sidebar) return;
-
     btn.addEventListener('click', function() {
       sidebar.classList.toggle('open');
       if (overlay) overlay.classList.toggle('active');
@@ -44,10 +43,7 @@ App.nav = {
     var input = document.querySelector('.topbar-search input');
     if (!input) return;
     document.addEventListener('keydown', function(e) {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-        e.preventDefault();
-        input.focus();
-      }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); input.focus(); }
       if (e.key === 'Escape') input.blur();
     });
   },
@@ -56,15 +52,10 @@ App.nav = {
     document.querySelectorAll('.dropdown').forEach(function(dd) {
       var trigger = dd.querySelector('[data-dropdown]');
       if (!trigger) return;
-      trigger.addEventListener('click', function(e) {
-        e.stopPropagation();
-        dd.classList.toggle('active');
-      });
+      trigger.addEventListener('click', function(e) { e.stopPropagation(); dd.classList.toggle('active'); });
     });
     document.addEventListener('click', function() {
-      document.querySelectorAll('.dropdown.active').forEach(function(dd) {
-        dd.classList.remove('active');
-      });
+      document.querySelectorAll('.dropdown.active').forEach(function(dd) { dd.classList.remove('active'); });
     });
   },
 
@@ -72,7 +63,6 @@ App.nav = {
     var settings = App.db.getSettings();
     var theme = settings.theme || 'light';
     document.documentElement.setAttribute('data-theme', theme);
-
     document.querySelectorAll('[data-theme-toggle]').forEach(function(btn) {
       btn.addEventListener('click', function() {
         var current = document.documentElement.getAttribute('data-theme');
@@ -100,7 +90,7 @@ App.nav = {
   renderSidebar: function(activePage) {
     var user = App.auth.getCurrentUser();
     var isAdmin = App.auth.isAdmin();
-    var settings = App.db.getNotifications().filter(function(n) { return !n.read; }).length;
+    var notifCount = App.db.getNotifications().filter(function(n) { return !n.read; }).length;
 
     var mainLinks = [
       { href: '../main/dashboard.html', icon: 'dashboard', label: App.t('nav.dashboard'), key: 'dashboard' },
@@ -108,13 +98,11 @@ App.nav = {
       { href: '../main/community.html', icon: 'people', label: App.t('nav.community'), key: 'community' },
       { href: '../main/search.html', icon: 'search', label: App.t('nav.search'), key: 'search' },
     ];
-
     var accountLinks = [
       { href: '../main/profile.html', icon: 'person', label: App.t('nav.profile'), key: 'profile' },
       { href: '../settings/settings.html', icon: 'settings', label: App.t('nav.settings'), key: 'settings' },
-      { href: '../settings/notifications.html', icon: 'notifications', label: App.t('nav.notifications'), key: 'notifications', badge: settings || '' },
+      { href: '../settings/notifications.html', icon: 'notifications', label: App.t('nav.notifications'), key: 'notifications', badge: notifCount || '' },
     ];
-
     var adminLinks = [
       { href: '../admin/admin.html', icon: 'admin_panel', label: App.t('nav.admin'), key: 'admin' },
     ];
@@ -124,28 +112,21 @@ App.nav = {
     html += '<div class="sidebar-section"><div class="sidebar-section-title">' + App.t('nav.main') + '</div>';
     mainLinks.forEach(function(l) {
       html += '<a href="' + l.href + '" class="sidebar-link' + (activePage === l.key ? ' active' : '') + '">';
-      html += '<span class="icon"><i class="material-icons">' + l.icon + '</i></span>';
-      html += '<span>' + l.label + '</span>';
+      html += '<span class="icon"><i class="material-icons">' + l.icon + '</i></span><span>' + l.label + '</span>';
       if (l.badge) html += '<span class="badge">' + l.badge + '</span>';
       html += '</a>';
     });
-    html += '</div>';
-
-    html += '<div class="sidebar-section"><div class="sidebar-section-title">' + App.t('nav.account') + '</div>';
+    html += '</div><div class="sidebar-section"><div class="sidebar-section-title">' + App.t('nav.account') + '</div>';
     accountLinks.forEach(function(l) {
       html += '<a href="' + l.href + '" class="sidebar-link' + (activePage === l.key ? ' active' : '') + '">';
-      html += '<span class="icon"><i class="material-icons">' + l.icon + '</i></span>';
-      html += '<span>' + l.label + '</span>';
+      html += '<span class="icon"><i class="material-icons">' + l.icon + '</i></span><span>' + l.label + '</span>';
       if (l.badge) html += '<span class="badge">' + l.badge + '</span>';
       html += '</a>';
     });
-
     if (isAdmin) {
       adminLinks.forEach(function(l) {
         html += '<a href="' + l.href + '" class="sidebar-link' + (activePage === l.key ? ' active' : '') + '">';
-        html += '<span class="icon"><i class="material-icons">' + l.icon + '</i></span>';
-        html += '<span>' + l.label + '</span>';
-        html += '</a>';
+        html += '<span class="icon"><i class="material-icons">' + l.icon + '</i></span><span>' + l.label + '</span></a>';
       });
     }
     html += '</div></nav>';
@@ -158,6 +139,7 @@ App.nav = {
     }
     html += '<div class="info"><div class="name">' + (user ? App.utils.sanitize(user.fullName) : 'Guest') + '</div>';
     html += '<div class="email">' + (user ? App.utils.sanitize(user.email) : '') + '</div></div>';
+    html += '<button class="btn btn-ghost btn-sm" style="color:var(--danger);margin-left:auto" onclick="App.auth.logout()" title="Logout"><i class="material-icons" style="font-size:18px">logout</i></button>';
     html += '</div></div>';
 
     var sidebar = document.querySelector('.sidebar');

@@ -105,7 +105,8 @@
       "password_short": "Parol kamida 8 ta belgi bo'lishi kerak",
       "password_letter": "Parolda harf bo'lishi kerak",
       "password_symbol": "Parolda belgi bo'lishi kerak",
-      "email_exists": "Bu email allaqachon ro'yxatdan o'tgan"
+      "email_exists": "Bu email allaqachon ro'yxatdan o'tgan",
+      "email_not_confirmed": "Email tasdiqlanmagan. Pochta qutingizni tekshiring."
     },
     "login_success": "Muvaffaqiyatli kirildi!",
     "register_success": "Hisob yaratildi!",

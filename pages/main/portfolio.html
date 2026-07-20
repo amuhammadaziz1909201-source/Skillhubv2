@@ -23,17 +23,22 @@
       <main class="page-content">
         <div class="flex justify-between items-center mb-8">
           <div>
-            <h2 data-i18n="portfolio.my_projects">My Projects</h2>
+            <h2 data-i18n="portfolio.explore">Explore Projects</h2>
             <p class="text-sm text-secondary mt-1" data-i18n="portfolio.explore_desc">Discover the best work from top developers.</p>
           </div>
           <button class="btn btn-primary" id="addProjectBtn"><span class="material-icons" style="font-size:18px">add</span> <span data-i18n="portfolio.add_project">Add Project</span></button>
         </div>
 
+        <div class="tabs mb-6">
+          <button class="tab active" data-view="all">All Projects</button>
+          <button class="tab" data-view="mine">My Projects</button>
+        </div>
+
         <div class="flex gap-3 mb-6">
-          <input class="input" style="max-width:300px" type="search" id="searchInput" placeholder="Search projects..." data-i18n-placeholder="nav.search_placeholder">
+          <input class="input" style="max-width:300px" type="search" id="searchInput" placeholder="Search projects...">
           <select class="input" style="width:auto" id="sortSelect">
-            <option value="newest" data-i18n="portfolio.newest">Newest</option>
-            <option value="popular" data-i18n="portfolio.popular">Popular</option>
+            <option value="newest">Newest</option>
+            <option value="popular">Popular</option>
           </select>
         </div>
 
@@ -51,19 +56,19 @@
 
   <div class="modal-overlay" id="projectModal">
     <div class="modal" style="max-width:540px">
-      <h3 class="mb-6" id="modalTitle" data-i18n="portfolio.add_project">Add Project</h3>
+      <h3 class="mb-6" id="modalTitle">Add Project</h3>
       <form id="projectForm" class="flex flex-col gap-5">
         <div class="input-group">
           <label data-i18n="portfolio.title">Title</label>
-          <input class="input" type="text" id="pTitle" required data-i18n-placeholder="portfolio.title_placeholder">
+          <input class="input" type="text" id="pTitle" required>
         </div>
         <div class="input-group">
           <label data-i18n="portfolio.description">Description</label>
-          <textarea class="input" id="pDesc" rows="3" data-i18n-placeholder="portfolio.desc_placeholder" style="resize:vertical"></textarea>
+          <textarea class="input" id="pDesc" rows="3" style="resize:vertical"></textarea>
         </div>
         <div class="input-group">
           <label data-i18n="portfolio.tags">Tags</label>
-          <input class="input" type="text" id="pTags" data-i18n-placeholder="portfolio.tags_placeholder">
+          <input class="input" type="text" id="pTags" placeholder="React, Tailwind, Node.js">
         </div>
         <div class="input-group">
           <label data-i18n="portfolio.image_url">Image URL</label>
@@ -78,6 +83,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="../../js/utils.js"></script>
   <script src="../../js/i18n.js"></script>
   <script src="../../js/supabase.js"></script>
@@ -92,13 +98,20 @@
         var res = await fetch('../../i18n/' + langs[i] + '.json');
         App.i18n.load(langs[i], await res.json());
       }
+      App.initSupabase();
+      App.auth.init();
       if (!App.auth.requireAuth()) return;
       App.pages.initLayout({ activePage: 'portfolio', title: App.t('nav.portfolio') });
 
       var user = App.auth.getCurrentUser();
+      var currentView = 'all';
 
       function renderProjects() {
-        var projects = App.db.getProjects().filter(function(p) { return p.userId === user.id; });
+        var projects = App.db.getAllProjects();
+        if (currentView === 'mine') {
+          projects = projects.filter(function(p) { return p.userId === user.id; });
+        }
+
         var query = document.getElementById('searchInput').value.toLowerCase();
         var sort = document.getElementById('sortSelect').value;
 
@@ -111,7 +124,7 @@
         if (sort === 'popular') {
           projects.sort(function(a, b) { return (b.likes || 0) - (a.likes || 0); });
         } else {
-          projects.sort(function(a, b) { return new Date(b.createdAt) - new Date(a.createdAt); });
+          projects.sort(function(a, b) { return new Date(b.createdAt || 0) - new Date(a.createdAt || 0); });
         }
 
         var grid = document.getElementById('projectsGrid');
@@ -124,6 +137,7 @@
           document.getElementById('emptyState').style.display = 'none';
           grid.style.display = '';
           projects.forEach(function(p) {
+            var isOwner = p.userId === user.id;
             var card = document.createElement('div');
             card.className = 'card';
             card.innerHTML =
@@ -137,14 +151,21 @@
               '</div>' +
               '<div class="flex justify-between items-center">' +
               '<div class="flex gap-3 text-xs text-tertiary"><span><span class="material-icons" style="font-size:14px;vertical-align:middle">visibility</span> ' + (p.views||0) + '</span><span><span class="material-icons" style="font-size:14px;vertical-align:middle">favorite</span> ' + (p.likes||0) + '</span></div>' +
-              '<div class="flex gap-2">' +
-              '<button class="btn btn-ghost btn-sm" onclick="editProject(\'' + p.id + '\')"><span class="material-icons" style="font-size:16px">edit</span></button>' +
-              '<button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="deleteProject(\'' + p.id + '\')"><span class="material-icons" style="font-size:16px">delete</span></button>' +
-              '</div></div>';
+              (isOwner ? '<div class="flex gap-2"><button class="btn btn-ghost btn-sm" onclick="editProject(\'' + p.id + '\')"><span class="material-icons" style="font-size:16px">edit</span></button><button class="btn btn-ghost btn-sm" style="color:var(--danger)" onclick="deleteProject(\'' + p.id + '\')"><span class="material-icons" style="font-size:16px">delete</span></button></div>' : '') +
+              '</div>';
             grid.appendChild(card);
           });
         }
       }
+
+      document.querySelectorAll('[data-view]').forEach(function(tab) {
+        tab.addEventListener('click', function() {
+          document.querySelectorAll('[data-view]').forEach(function(t) { t.classList.remove('active'); });
+          this.classList.add('active');
+          currentView = this.getAttribute('data-view');
+          renderProjects();
+        });
+      });
 
       document.getElementById('addProjectBtn').addEventListener('click', function() {
         document.getElementById('modalTitle').textContent = App.t('portfolio.add_project');
@@ -179,6 +200,7 @@
       document.getElementById('projectForm').addEventListener('submit', function(e) {
         e.preventDefault();
         var id = document.getElementById('pId').value;
+        var existing = id ? App.db.getProjects().find(function(x){return x.id===id;}) : null;
         var project = {
           id: id || undefined,
           title: document.getElementById('pTitle').value.trim(),
@@ -186,9 +208,9 @@
           tags: document.getElementById('pTags').value.split(',').map(function(t) { return t.trim(); }).filter(Boolean),
           image: document.getElementById('pImage').value.trim(),
           userId: user.id,
-          views: id ? (App.db.getProjects().find(function(x){return x.id===id})||{}).views || 0 : 0,
-          likes: id ? (App.db.getProjects().find(function(x){return x.id===id})||{}).likes || 0 : 0,
-          createdAt: id ? (App.db.getProjects().find(function(x){return x.id===id})||{}).createdAt || new Date().toISOString() : new Date().toISOString()
+          views: existing ? existing.views || 0 : 0,
+          likes: existing ? existing.likes || 0 : 0,
+          createdAt: existing ? existing.createdAt : new Date().toISOString()
         };
         App.db.saveProject(project);
         App.toast(id ? App.t('portfolio.updated') : App.t('portfolio.added'), 'success');

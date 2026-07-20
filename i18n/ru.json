@@ -105,7 +105,8 @@
       "password_short": "Пароль должен содержать минимум 8 символов",
       "password_letter": "Пароль должен содержать букву",
       "password_symbol": "Пароль должен содержать символ",
-      "email_exists": "Этот email уже зарегистрирован"
+      "email_exists": "Этот email уже зарегистрирован",
+      "email_not_confirmed": "Email не подтверждён. Проверьте почту."
     },
     "login_success": "Успешный вход!",
     "register_success": "Аккаунт создан!",
