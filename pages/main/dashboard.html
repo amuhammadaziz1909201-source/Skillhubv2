@@ -95,7 +95,6 @@
       }
       App.initSupabase();
       App.auth.init();
-      App.pages.seedDemoData();
       if (!App.auth.requireAuth()) return;
 
       App.pages.initLayout({ activePage: 'dashboard', title: App.t('nav.dashboard') });
@@ -104,7 +103,7 @@
       var firstName = user ? user.firstName || user.fullName.split(' ')[0] : '';
       document.getElementById('welcomeMsg').textContent = App.t('dashboard.welcome') + ', ' + firstName;
 
-      var allProjects = App.db.getAllProjects();
+      var allProjects = await App.db.getAllProjects();
       var myProjects = allProjects.filter(function(p) { return p.userId === (user ? user.id : ''); }).slice(0, 6);
       document.getElementById('statProjects').textContent = myProjects.length;
 
@@ -116,7 +115,6 @@
         grid.style.display = 'none';
       } else {
         displayProjects.forEach(function(p) {
-          var owner = App.db.findUserById ? App.db.findUserById(p.userId) : null;
           var card = document.createElement('div');
           card.className = 'card';
           card.innerHTML = '<div style="height:140px;background:var(--bg-secondary);border-radius:var(--radius-md);margin-bottom:var(--space-4);display:flex;align-items:center;justify-content:center;overflow:hidden">' +

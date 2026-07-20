@@ -106,8 +106,8 @@
       var user = App.auth.getCurrentUser();
       var currentView = 'all';
 
-      function renderProjects() {
-        var projects = App.db.getAllProjects();
+      async function renderProjects() {
+        var projects = await App.db.getAllProjects();
         if (currentView === 'mine') {
           projects = projects.filter(function(p) { return p.userId === user.id; });
         }
@@ -189,15 +189,15 @@
         App.modal.show('projectModal');
       };
 
-      window.deleteProject = function(id) {
-        App.modal.confirm(App.t('portfolio.confirm_delete'), function() {
-          App.db.deleteProject(id);
+      window.deleteProject = async function(id) {
+        App.modal.confirm(App.t('portfolio.confirm_delete'), async function() {
+          await App.db.deleteProject(id);
           App.toast(App.t('portfolio.removed'), 'success');
-          renderProjects();
+          await renderProjects();
         });
       };
 
-      document.getElementById('projectForm').addEventListener('submit', function(e) {
+      document.getElementById('projectForm').addEventListener('submit', async function(e) {
         e.preventDefault();
         var id = document.getElementById('pId').value;
         var existing = id ? App.db.getProjects().find(function(x){return x.id===id;}) : null;
@@ -212,10 +212,10 @@
           likes: existing ? existing.likes || 0 : 0,
           createdAt: existing ? existing.createdAt : new Date().toISOString()
         };
-        App.db.saveProject(project);
+        await App.db.saveProject(project);
         App.toast(id ? App.t('portfolio.updated') : App.t('portfolio.added'), 'success');
         App.modal.hide('projectModal');
-        renderProjects();
+        await renderProjects();
       });
 
       document.getElementById('searchInput').addEventListener('input', App.utils.debounce(renderProjects, 300));

@@ -150,18 +150,23 @@
         t.addEventListener('click', function() { this.classList.toggle('active'); });
       });
 
-      document.getElementById('updatePassBtn').addEventListener('click', function() {
+      document.getElementById('updatePassBtn').addEventListener('click', async function() {
         var user = App.auth.getCurrentUser();
         var current = document.getElementById('currentPass').value;
         var newPass = document.getElementById('newPass').value;
         var confirm = document.getElementById('confirmPass').value;
 
-        if (current !== user.password) { App.toast('Current password is wrong', 'error'); return; }
-        if (newPass.length < 8) { App.toast('Password too short', 'error'); return; }
-        if (newPass !== confirm) { App.toast('Passwords do not match', 'error'); return; }
-
-        App.auth.updateProfile({ password: newPass });
-        App.toast(App.t('settings.saved'), 'success');
+        if (App.isSupabase()) {
+          var result = await App.sb.auth.updateUser({ password: newPass });
+          if (result.error) { App.toast(result.error.message, 'error'); return; }
+          App.toast(App.t('settings.saved'), 'success');
+        } else {
+          if (current !== user.password) { App.toast('Current password is wrong', 'error'); return; }
+          if (newPass.length < 8) { App.toast('Password too short', 'error'); return; }
+          if (newPass !== confirm) { App.toast('Passwords do not match', 'error'); return; }
+          await App.auth.updateProfile({ password: newPass });
+          App.toast(App.t('settings.saved'), 'success');
+        }
         document.getElementById('currentPass').value = '';
         document.getElementById('newPass').value = '';
         document.getElementById('confirmPass').value = '';

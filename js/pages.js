@@ -53,9 +53,10 @@ App.pages = {
     });
   },
 
-  seedDemoData: function() {
-    var users = App.db.getUsers();
+  seedDemoData: async function() {
+    var users = await App.db.getProfiles();
     if (users.length > 0) return;
+    if (App.isSupabase()) return;
 
     var demoUsers = [
       { id:'u1', firstName:'Alex', lastName:'Rivera', fullName:'Alex Rivera', email:'alex@skillhub.com', password:'Admin@123', avatar:'', bio:'Full-stack developer passionate about clean UI.', role:'admin', skills:['React','Node.js','TypeScript'], links:{github:'alexrivera'}, createdAt:'2025-01-15T10:00:00Z' },

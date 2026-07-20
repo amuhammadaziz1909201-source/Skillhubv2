@@ -133,7 +133,7 @@
       }
       App.initSupabase();
       App.auth.init();
-      App.pages.seedDemoData();
+      await App.pages.seedDemoData();
       App.pages.initLanding();
 
       document.querySelector('[data-lang-select]').value = App.i18n.getLang();

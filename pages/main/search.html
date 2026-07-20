@@ -65,7 +65,7 @@
 
       var currentFilter = 'all';
 
-      function doSearch() {
+      async function doSearch() {
         var q = document.getElementById('searchInput').value.toLowerCase().trim();
         var results = document.getElementById('results');
         var countEl = document.getElementById('resultCount');
@@ -80,7 +80,8 @@
         var items = [];
 
         if (currentFilter === 'all' || currentFilter === 'projects') {
-          App.db.getProjects().forEach(function(p) {
+          var allProjects = await App.db.getAllProjects();
+          allProjects.forEach(function(p) {
             if (p.title.toLowerCase().indexOf(q) !== -1 || (p.description||'').toLowerCase().indexOf(q) !== -1 || (p.tags||[]).join(' ').toLowerCase().indexOf(q) !== -1) {
               items.push({ type: 'project', data: p });
             }
@@ -88,7 +89,8 @@
         }
 
         if (currentFilter === 'all' || currentFilter === 'users') {
-          App.db.getUsers().forEach(function(u) {
+          var allUsers = await App.db.getProfiles();
+          allUsers.forEach(function(u) {
             if (u.fullName.toLowerCase().indexOf(q) !== -1 || u.email.toLowerCase().indexOf(q) !== -1 || (u.skills||[]).join(' ').toLowerCase().indexOf(q) !== -1) {
               items.push({ type: 'user', data: u });
             }

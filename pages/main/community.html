@@ -52,7 +52,7 @@
       App.pages.initLayout({ activePage: 'community', title: App.t('nav.community') });
 
       var currentUser = App.auth.getCurrentUser();
-      var users = App.db.getUsers().filter(function(u) { return u.id !== currentUser.id; });
+      var users = (await App.db.getProfiles()).filter(function(u) { return u.id !== currentUser.id; });
       var grid = document.getElementById('membersGrid');
 
       users.forEach(function(u) {

@@ -112,7 +112,7 @@
         linksEl.innerHTML = '<p class="text-sm text-tertiary" data-i18n="profile.no_links">No links added yet</p>';
       }
 
-      var projects = App.db.getProjects().filter(function(p) { return p.userId === user.id; });
+      var projects = await App.db.getProjectsByUser(user.id);
       var projectsEl = document.getElementById('userProjects');
       projects.forEach(function(p) {
         projectsEl.innerHTML += '<div class="card"><h4 class="mb-2">' + App.utils.sanitize(p.title) + '</h4><p class="text-sm text-secondary mb-4">' + App.utils.sanitize(p.description || '') + '</p><div class="flex gap-2 flex-wrap">' +

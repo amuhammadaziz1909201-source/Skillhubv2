@@ -111,9 +111,9 @@
       App.auth.init();
       App.pages.initLayout({ activePage: 'admin', title: App.t('admin.title') });
 
-      function renderUsers() {
-        var users = App.db.getUsers();
-        var projects = App.db.getProjects();
+      async function renderUsers() {
+        var users = await App.db.getProfiles();
+        var projects = await App.db.getAllProjects();
         document.getElementById('totalUsers').textContent = users.length;
         document.getElementById('totalProjects').textContent = projects.length;
         document.getElementById('totalViews').textContent = projects.reduce(function(sum, p) { return sum + (p.views || 0); }, 0).toLocaleString();
@@ -137,17 +137,16 @@
           var btn = e.target.closest('[data-delete-user]');
           if (!btn) return;
           var uid = btn.getAttribute('data-delete-user');
-          App.modal.confirm(App.t('admin.confirm_delete_user'), function() {
-            var allUsers = App.db.getUsers().filter(function(u) { return u.id !== uid; });
-            localStorage.setItem('sh_users', JSON.stringify(allUsers));
-            renderUsers();
+          App.modal.confirm(App.t('admin.confirm_delete_user'), async function() {
+            await App.db.deleteProfile(uid);
+            await renderUsers();
           });
         });
       }
 
-      function renderProjects() {
-        var projects = App.db.getProjects();
-        var users = App.db.getUsers();
+      async function renderProjects() {
+        var projects = await App.db.getAllProjects();
+        var users = await App.db.getProfiles();
         var tbody = document.getElementById('projectsTable');
         tbody.innerHTML = '';
         projects.forEach(function(p) {
@@ -162,16 +161,16 @@
           tbody.appendChild(tr);
         });
 
-        tbody.addEventListener('click', function(e) {
+        tbody.addEventListener('click', async function(e) {
           var btn = e.target.closest('[data-delete-proj]');
           if (!btn) return;
-          App.db.deleteProject(btn.getAttribute('data-delete-proj'));
-          renderProjects();
+          await App.db.deleteProject(btn.getAttribute('data-delete-proj'));
+          await renderProjects();
         });
       }
 
       document.querySelectorAll('[data-atab]').forEach(function(tab) {
-        tab.addEventListener('click', function() {
+        tab.addEventListener('click', async function() {
           document.querySelectorAll('[data-atab]').forEach(function(t) { t.classList.remove('active'); });
           this.classList.add('active');
           var id = this.getAttribute('data-atab');
@@ -180,8 +179,8 @@
         });
       });
 
-      renderUsers();
-      renderProjects();
+      await renderUsers();
+      await renderProjects();
     })();
   </script>
 </body>

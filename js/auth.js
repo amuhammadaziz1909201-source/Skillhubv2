@@ -32,12 +32,12 @@ App.auth = {
       App.sb.auth.getSession().then(function(res) {
         var session = res.data.session;
         if (session && session.user) {
-          self._supabaseUserToLocal(session.user);
+          self._syncSupabaseUser(session.user);
         }
       });
       App.sb.auth.onAuthStateChange(function(event, session) {
         if (event === 'SIGNED_IN' && session) {
-          self._supabaseUserToLocal(session.user);
+          self._syncSupabaseUser(session.user);
         } else if (event === 'SIGNED_OUT') {
           self._clearLocal();
         }
@@ -45,8 +45,30 @@ App.auth = {
     }
   },
 
-  _supabaseUserToLocal: function(sbUser) {
+  _syncSupabaseUser: async function(sbUser) {
     var meta = sbUser.user_metadata || {};
+
+    if (App.isSupabase()) {
+      var res = await App.sb.from('profiles').select('*').eq('id', sbUser.id).single();
+      if (res.data) {
+        var user = {
+          id: res.data.id,
+          email: sbUser.email || '',
+          fullName: res.data.full_name || sbUser.email || '',
+          firstName: res.data.first_name || '',
+          lastName: res.data.last_name || '',
+          avatar: res.data.avatar || '',
+          bio: res.data.bio || '',
+          role: res.data.role || 'user',
+          skills: res.data.skills || [],
+          links: res.data.links || {},
+          createdAt: res.data.created_at || new Date().toISOString()
+        };
+        this.setCurrentUser(user);
+        return;
+      }
+    }
+
     var user = {
       id: sbUser.id,
       email: sbUser.email || '',
@@ -61,7 +83,6 @@ App.auth = {
       createdAt: sbUser.created_at || new Date().toISOString()
     };
     this.setCurrentUser(user);
-    App.db.saveUser(user);
   },
 
   _clearLocal: function() {
@@ -117,6 +138,7 @@ App.auth = {
       createdAt: new Date().toISOString()
     };
     App.db.saveUser(user);
+    this.setCurrentUser(user);
     return { user: user, needsVerification: false };
   },
 
@@ -156,8 +178,19 @@ App.auth = {
     if (!user) return false;
 
     if (App.isSupabase()) {
-      var result = await App.sb.auth.updateUser({ data: updates });
-      if (result.error) return false;
+      var dbUpdates = {};
+      if (updates.fullName !== undefined) dbUpdates.full_name = updates.fullName;
+      if (updates.firstName !== undefined) dbUpdates.first_name = updates.firstName;
+      if (updates.lastName !== undefined) dbUpdates.last_name = updates.lastName;
+      if (updates.avatar !== undefined) dbUpdates.avatar = updates.avatar;
+      if (updates.bio !== undefined) dbUpdates.bio = updates.bio;
+      if (updates.skills !== undefined) dbUpdates.skills = updates.skills;
+      if (updates.links !== undefined) dbUpdates.links = updates.links;
+
+      var res = await App.sb.from('profiles').update(dbUpdates).eq('id', user.id);
+      if (res.error) return false;
+
+      await App.sb.auth.updateUser({ data: updates });
     }
     Object.assign(user, updates);
     App.db.saveUser(user);

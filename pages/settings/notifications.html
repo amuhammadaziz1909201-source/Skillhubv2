@@ -61,8 +61,8 @@
       App.auth.init();
       App.pages.initLayout({ activePage: 'notifications', title: App.t('nav.notifications') });
 
-      function render() {
-        var list = App.db.getNotifications();
+      async function render() {
+        var list = await App.db.getNotifications();
         var el = document.getElementById('notifList');
         var empty = document.getElementById('emptyState');
         el.innerHTML = '';
@@ -82,28 +82,25 @@
             '<span class="material-icons" style="color:var(--' + (n.type === 'warning' ? 'warning' : n.type === 'error' ? 'danger' : n.type === 'success' ? 'success' : 'primary') + ')">' + (iconMap[n.type] || 'info') + '</span>' +
             '<div style="flex:1"><p class="text-sm">' + App.utils.sanitize(n.message) + '</p><p class="text-xs text-tertiary mt-1">' + App.utils.timeAgo(n.createdAt) + '</p></div>' +
             (!n.read ? '<div style="width:8px;height:8px;background:var(--primary);border-radius:50%;flex-shrink:0"></div>' : '');
-          item.addEventListener('click', function() {
-            n.read = true;
-            localStorage.setItem('sh_notifications', JSON.stringify(list));
-            render();
+          item.addEventListener('click', async function() {
+            await App.db.markNotificationRead(n.id);
+            await render();
           });
           el.appendChild(item);
         });
       }
 
-      document.getElementById('markAllRead').addEventListener('click', function() {
-        var list = App.db.getNotifications();
-        list.forEach(function(n) { n.read = true; });
-        localStorage.setItem('sh_notifications', JSON.stringify(list));
-        render();
+      document.getElementById('markAllRead').addEventListener('click', async function() {
+        await App.db.markAllNotificationsRead();
+        await render();
       });
 
-      document.getElementById('clearAll').addEventListener('click', function() {
-        localStorage.setItem('sh_notifications', '[]');
-        render();
+      document.getElementById('clearAll').addEventListener('click', async function() {
+        await App.db.clearNotifications();
+        await render();
       });
 
-      render();
+      await render();
     })();
   </script>
 </body>
